@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function Header(){
+export default function HomePage(){
     return(
         <div className="relative flex flex-col h-screen">
             <div style={{backgroundImage: `url(/home-image.jpg)`, 

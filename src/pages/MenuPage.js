@@ -1,9 +1,14 @@
 import Link from 'next/link'
 import MenuCard from './components/MenuCard'
+import Header from './components/Header'
 
 export default function MenuPage(){
     return(
         <div>
+            <div className="relative z-10">
+                <Header/>
+            </div>
+            <div>
             <div className='fixed inset-0 animate-pulse'>
                 <div>
                     <div>
@@ -65,6 +70,7 @@ export default function MenuPage(){
                 </div>
             </div>
             </div>
+        </div>
         </div>
     )
 }
