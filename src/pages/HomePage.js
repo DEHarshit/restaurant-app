@@ -19,7 +19,7 @@ export default function HomePage(){
                             <h2>RESTAURANT</h2>
                         </div>
                         <div className="flex scale-[0.8]">
-                            <div class="  
+                            <div className="  
                             border-t-[15px] border-t-transparent
                             border-r-[15px] border-r-white
                             border-b-[15px] border-b-transparent">
@@ -27,7 +27,7 @@ export default function HomePage(){
                             <div className="flex w-[80px] text-sm items-center justify-center bg-white text-zinc-600">
                                 DMLUASN
                             </div>
-                            <div class="
+                            <div className="
                             border-t-[15px] border-t-transparent
                             border-l-[15px] border-l-white
                             border-b-[15px] border-b-transparent">

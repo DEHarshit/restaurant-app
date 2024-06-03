@@ -1,6 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export default function AddDish() {
+
+    const dishNameRef = useRef();
+    const dishPriceRef = useRef();
+
+    const [ingredients, setIngredients] = useState([]);
+
+    async function getIngredients(){
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/ingredients`, postData);
+        const response = await res.json();
+        setIngredients(response.ingredients)
+    }
+
+    function addIngredient() {
+        var container = document.getElementById('ingredient-container');
+        var select = document.createElement('select');
+        select.name = 'ing';
+        select.className = 'text-black rounded-lg p-1 text-primary font-medium';
+        ingredients.forEach(ingredient => {
+            const option = document.createElement('option');
+            option.value = ingredient.NAME;  // Using NAME property
+            option.textContent = ingredient.NAME;  // Using NAME property
+            select.appendChild(option);
+        });
+        var qty = document.createElement('input');
+        qty.type = 'number';
+        qty.className = '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-1 text-black rounded-lg';
+        qty.name = 'qty';
+        qty.placeholder = 'Enter Quantity';
+        var qtyLabel = document.createElement('label');
+        qtyLabel.textContent = 'kg/liters';
+        container.appendChild(select);
+        container.appendChild(qty);
+        container.appendChild(qtyLabel);
+    }
+
+    function revIngredient() {
+        var container = document.getElementById('ingredient-container');
+        if (container.hasChildNodes()) {
+            container.removeChild(container.lastChild);
+            container.removeChild(container.lastChild);
+            container.removeChild(container.lastChild);
+        }
+    }
+
+    useEffect(() => {
+        getIngredients();
+    }, [])
+
     const [image, setImage] = useState('/placeholder.png')
     return (
         <div className="bg-black font-primary flex justify-center items-center  h-screen">
@@ -17,10 +71,10 @@ export default function AddDish() {
             <form action="/" method="post" id="dishForm">
                 <div className='flex flex-col overflow-hidden -translate-y-3'>
                     <div className="flex justify-center z-10 bg-zinc-900 rounded-xl overflow-auto h-[780px] w-[500px] scale-[0.95]">
-                        <div className="p-10 flex flex-col space-y-5">
+                        <div className="-translate-y-5 p-10 flex flex-col space-y-5">
                             <div className='flex flex-col justify-center items-center gap-2'>
-                            <h2 className="p-1 flex items-center justify-center text-3xl tracking-wider leading-9 font-semibold text-primary"> ADD A NEW DISH </h2>
-                            <hr className="w-[300px] h-0.5 border-0 bg-gradient-to-r from-[#CEA07E] to-[#BB5656]"></hr>
+                                <h2 className="p-1 flex items-center justify-center text-3xl tracking-wider leading-9 font-semibold text-primary"> ADD A NEW DISH </h2>
+                                <hr className="w-[300px] h-0.5 border-0 bg-gradient-to-r from-[#CEA07E] to-[#BB5656]"></hr>
                             </div>
                             <div className="flex items-center justify-center">
                                 <div style={{
@@ -34,7 +88,7 @@ export default function AddDish() {
                                 </div>
                             </div>
                             <div className="flex space-x-5 items-center justify-center">
-                                <h2 className="text-white text-lg font-medium">DISH NAME:</h2>
+                                <h2 className="text-white text-lg font-medium" >DISH NAME:</h2>
                                 <input type="text" id="name" name="name" className=" p-1 text-black rounded-lg" />
                             </div>
                             <div className="text-white flex flex-col items-center justify-center space-y-2">
@@ -59,14 +113,14 @@ export default function AddDish() {
                             <div className="flex flex-col space-y-1 "> {/* Ingredients */}
                                 <h2 className="text-white text-lg font-medium">INGREIDENTS: </h2>
                                 <div className="flex flex-col space-y-1 bg-zinc-800 rounded-lg">
-                                    <div className="flex justify-evenly p-2">  {/* Add & Remove */}
-                                        <div className="text-white font-medium">
+                                    <div className="flex justify-evenly w-[420px] p-2">  {/* Add & Remove */}
+                                        <div className="text-white font-medium hover:bg-zinc-300 p-1 transition-all rounded-lg hover:text-black" onClick={() => addIngredient()}>
                                             <h2>Add Ingredient</h2>
                                         </div>
                                         <div className="border">
 
                                         </div>
-                                        <div className="text-white font-medium">
+                                        <div className="text-white font-medium hover:bg-zinc-300 p-1 transition-all rounded-lg hover:text-black" onClick={() => revIngredient()}>
                                             <h2>Remove Ingredient</h2>
                                         </div>
                                     </div>
@@ -74,7 +128,7 @@ export default function AddDish() {
 
                                     </div>
                                     <div> {/* Ingredients */}
-                                        <div id="ingredient-container">
+                                        <div id="ingredient-container" className=" grid grid-cols-3 gap-3 p-4">
 
                                         </div>
                                     </div>
@@ -107,52 +161,3 @@ export default function AddDish() {
         </div>
     )
 }
-/* 
-<div>
-                    <label for="name">DISH NAME:</label>
-                    <input type="text" id="name" name="name" /><br />
-                    <br />
-                    <label for="time">DISH TIMINGS</label><br />
-                    <select name="timings" id="timings" multiple>
-                        <option value="M">BREAKFAST</option>
-                        <option value="L">LUNCH</option>
-                        <option value="E">SNACK</option>
-                        <option value="N">DINNER</option>
-                    </select>
-                </div>
-                <br />
-                <label for="price">DISH PRICE:</label>
-                <input type="text" id="price" name="price" /><br />
-                <br />
-                <label for="ingredients">INGREDIENTS: </label><br /><br />
-                <button class="bnt" type="button" onclick="addIngredient()">Add Ingredient</button>
-                <button class="bnt" type="button" onclick="revIngredient()">Remove Ingredient</button>
-                <br /><br />
-                <div id="ingredient-container">
-                </div>
-                <br />
-                <div class="dtype">
-                    <label class="opn" for="type">DISH TYPE</label>
-                    <select id="type" name="type">
-                        <option class="opn1" value="vegetarian">Vegetarian</option>
-                        <option class="opn1" value="non-vegetarian">Non-Vegetarian</option>
-                        <option class="opn1" value="vegan">Vegan</option>
-                    </select><br /><br />
-                </div>
-
-                <div class="dish_image">
-                    <label for="image">DISH IMAGE</label>
-                    <input type="file" id="image" name="image" accept="image/*" />
-                </div>
-
-                <br />
-                <div class="btns">
-                    <input type="button" class="btn" value="Previous" onclick="previousStep()" />
-                    <input type="submit" class="btn" value="Update" />
-                    <button type="button" class="btn" onclick="clearForm()">Clear</button>
-                    <input type="submit" class="btn" value="Save" />
-                    <button type="submit" class="btn" value="Commit" onclick="commitData()">Commit</button>
-                    <input type="button" class="btn" value="Next" onclick="nextStep()" />
-
-                </div>
- */
