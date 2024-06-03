@@ -1,3 +1,4 @@
+import Link from 'next/link'
 export default function Header(){
     return(
         <div className="flex items-center justify-between p-5">
@@ -5,6 +6,7 @@ export default function Header(){
         <div className="font-primary font-bold tracking-wider">
             <h2>RESTAURANT</h2>
         </div>
+        <Link href='/'>
         <div className="flex scale-[0.8]">
             <div class="  
             border-t-[15px] border-t-transparent
@@ -20,6 +22,7 @@ export default function Header(){
             border-b-[15px] border-b-transparent">
             </div>
         </div>
+        </Link>
 
     </div>
     <div>
