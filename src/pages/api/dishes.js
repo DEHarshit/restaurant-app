@@ -20,28 +20,38 @@ export default async function handler(req, res) {
             const jsonData = await fsPromises.readFile(filePath);
             const objectData = JSON.parse(jsonData);
 
-            for(const dish of objectData){
+            for (const dish of objectData) {
                 const addDish = await query({
                     query: "INSERT INTO DISHES (ID,IMAGE,NAME,DESCRIPTION,PRICE,SPECIAL,ISVEG) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE IMAGE=VALUES(IMAGE),NAME=VALUES(NAME),DESCRIPTION=VALUES(DESCRIPTION),PRICE=VALUES(PRICE),SPECIAL=VALUES(SPECIAL),ISVEG=VALUES(ISVEG)",
                     values: [dish.id, dish.image, dish.name, '', dish.price, false, dish.isveg]
                 })
             }
 
-            await query({
-                query: "DELETE FROM RECIPES WHERE DNAME = ?",
-                values: [objectData.name]
-            });
 
-            objectData.ing.forEach(async (dish, index) => {
-                const addIng = await query({
-                    query:"INSERT INTO RECIPES (DNAME, INAME, QTY) VALUES (?, ?, ?)",
-                    values: [objectData.name, dish, objectData.qty[index]]
-                });
-            });
+            for (const dish of objectData) {
+                if (Array.isArray(dish.ing) && Array.isArray(dish.qty) && dish.ing.length === dish.qty.length) {
+                    await query({
+                        query: "DELETE FROM RECIPES WHERE DNAME = ?",
+                        values: [dish.name]
+                    });
 
-            
+                    for (let i = 0; i < dish.ing.length; i++) {
+                        const ing = dish.ing[i];
+                        const qty = dish.qty[i];
+                        const addIng = await query({
+                            query: "INSERT INTO RECIPES (DNAME, INAME, QTY) VALUES (?, ?, ?)",
+                            values: [dish.name, ing || null, qty || null]
+                        });
+                    }
+                } else {
+                    console.error("Error: Ingredients or quantities are not properly defined for dish:", dish.name);
+                }
+            }
+
+
+
             res.status(200).json({ success: true });
-        } catch {
+        } catch (error) {
 
             res.status(500).json({ success: false, error: error.message });
         }
