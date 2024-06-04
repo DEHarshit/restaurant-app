@@ -23,11 +23,11 @@ export default async function handler(req, res) {
             for (const dish of objectData) {
                 const addDish = await query({
                     query: "INSERT INTO DISHES (ID,IMAGE,NAME,DESCRIPTION,PRICE,SPECIAL,ISVEG) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE IMAGE=VALUES(IMAGE),NAME=VALUES(NAME),DESCRIPTION=VALUES(DESCRIPTION),PRICE=VALUES(PRICE),SPECIAL=VALUES(SPECIAL),ISVEG=VALUES(ISVEG)",
-                    values: [dish.id, dish.image, dish.name, '', dish.price, false, dish.isveg]
+                    values: [dish.id, dish.image || '/placeholder.png', dish.name || '', '', dish.price, false,  dish.isveg]
                 })
             }
             for (const dish of objectData) {
-                let timings =dish.type[0];
+                let timings =dish.type[0] || ''; 
                 if (Array.isArray(dish.type) && dish.type.length >1 ){
                     for (let i = 1; i < dish.type.length; i++){
                         timings = timings.concat(",",dish.type[i]);
@@ -43,16 +43,16 @@ export default async function handler(req, res) {
             for (const dish of objectData) {
                 if (Array.isArray(dish.ing) && Array.isArray(dish.qty) && dish.ing.length === dish.qty.length) {
                     await query({
-                        query: "DELETE FROM RECIPES WHERE DNAME = ?",
-                        values: [dish.name]
+                        query: "DELETE FROM RECIPES WHERE DID = ?",
+                        values: [dish.id]
                     });
 
                     for (let i = 0; i < dish.ing.length; i++) {
                         const ing = dish.ing[i];
                         const qty = dish.qty[i];
                         const addIng = await query({
-                            query: "INSERT INTO RECIPES (DNAME, INAME, QTY) VALUES (?, ?, ?)",
-                            values: [dish.name, ing || null, qty || null]
+                            query: "INSERT INTO RECIPES (DID, INAME, QTY) VALUES (?, ?, ?)",
+                            values: [dish.id, ing || null, qty || null]
                         });
                     }
                 } else {

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     if (req.method == "POST") {
         const jsonData = await fsPromises.readFile(filePath);
         const objectData = JSON.parse(jsonData);
-        const { image, name, price, type, ing, qty, isveg } = req.body;
+        const { index,image, name, price, type, ing, qty, isveg } = req.body;
 
         let imageUrl = image;
         if (image !== '/placeholder.png' && image.indexOf('/dishes/') === -1) {
@@ -29,9 +29,8 @@ export default async function handler(req, res) {
 
             imageUrl = `/dishes/${imageName}`;
         }
-        const id = Object.keys(objectData).length
         const newData = {
-            id,
+            id:index+1,
             image: imageUrl,
             name,
             type,
@@ -66,9 +65,8 @@ export default async function handler(req, res) {
 
             imageUrl = `/dishes/${imageName}`;
         }
-        const id = index + 1;
         const newData = {
-            id,
+            id:index+1,
             image: imageUrl,
             name,
             type,

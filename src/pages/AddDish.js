@@ -9,7 +9,7 @@ export default function AddDish() {
     const [image, setImage] = useState('/placeholder.png');
     const [dishName, setDishName] = useState('');
     const [dishTimings, setDishTimings] = useState([]);
-    const [dishPrice, setDishPrice] = useState('');
+    const [dishPrice, setDishPrice] = useState(0);
     const [isVeg, setIsVeg] = useState(false);
     const [dishIngredients, setDishIngredients] = useState([]);
     const [dishQty, setDishQty] = useState([]);
@@ -45,7 +45,7 @@ export default function AddDish() {
         setImage('/placeholder.png');
         setDishName('');
         setDishTimings([]);
-        setDishPrice('');
+        setDishPrice(0);
         setIsVeg(false);
         setDishIngredients([]);
         setDishQty([]);
@@ -62,13 +62,23 @@ export default function AddDish() {
     }
 
     function handleNext() {
-        if (index != formData.length)
-            setIndex(index + 1);
+        let nextIndex = index + 1;
+        while (nextIndex < formData.length && formData[nextIndex].name === "") {
+            nextIndex++;
+        }
+        if (nextIndex <= formData.length) {
+            setIndex(nextIndex);
+        }
     }
 
     function handlePrev() {
-        if (index - 1 != -1)
-            setIndex(index - 1);
+        let prevIndex = index - 1;
+        while (prevIndex >= 0 && formData[prevIndex].name === "") {
+            prevIndex--;
+        }
+        if (prevIndex >= 0) {
+            setIndex(prevIndex);
+        }
     }
 
     function handleImageChange(e) {
@@ -93,6 +103,7 @@ export default function AddDish() {
 
     function handleSave() {
         const Data = {
+            index: index,
             image: image,
             name: dishName,
             type: dishTimings,
@@ -200,7 +211,7 @@ export default function AddDish() {
     }, [])
 
     useEffect(() => {
-        console.log(index)
+        console.log(index+1)
         if (index + 1 <= formData.length) {
             if (ingredients && formData && formData[index]) {
                 (formData[index].image === "")
