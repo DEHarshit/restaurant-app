@@ -9,7 +9,7 @@ export default async function handler(req, res) {
 
     if (req.method == "GET") {
         const dishes = await query({
-            query: "SELECT D.ID,D.NAME,DESCRIPTION,IMAGE,SPECIAL,PRICE,ISVEG,D.TYPE,INAME,QTY,UOM FROM DISHES D, RECIPES R,INGREDIENTS I WHERE D.NAME=R.DNAME AND I.NAME=R.INAME",
+            query: "SELECT D.ID,D.NAME,DESCRIPTION,IMAGE,SPECIAL,PRICE,ISVEG,D.TYPE FROM DISHES D",
             values: []
         })
         res.status(200).json({ dishes });

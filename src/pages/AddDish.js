@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function AddDish() {
 
@@ -289,13 +289,13 @@ export default function AddDish() {
                                 <div className="flex flex-col space-y-1 bg-zinc-800 rounded-lg">
                                     <div className="flex justify-evenly w-[420px] p-2">  {/* Add & Remove */}
                                         <div className="text-white font-medium hover:bg-zinc-300 p-1 transition-all rounded-lg hover:text-black" onClick={() => addIngredient()}>
-                                            <h2>Add Ingredient</h2>
+                                            <button type="button">Add Ingredient</button>
                                         </div>
                                         <div className="border">
 
                                         </div>
                                         <div className="text-white font-medium hover:bg-zinc-300 p-1 transition-all rounded-lg hover:text-black" onClick={() => revIngredient()}>
-                                            <h2>Remove Ingredient</h2>
+                                            <button type="button">Remove Ingredient</button>
                                         </div>
                                     </div>
                                     <div className="border-t">
