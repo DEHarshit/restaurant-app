@@ -56,7 +56,14 @@ export default function MenuPage() {
                             </div>
                             <div className='flex flex-col space-y-7'>
                                 <div className='flex flex-col space-y-2'>
-                                    <div className='font-primary leading-9 tracking-widest text-lg'>Today's Special</div>
+                                    <div className='font-primary leading-9 tracking-widest text-lg space-x-2'>
+                                        <span>
+                                        Today's
+                                        </span>
+                                        <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text ">
+                                            Special
+                                        </span>
+                                    </div>
                                     <hr className="w-[100px] h-0.5 border-0 bg-gradient-to-r from-[#CEA07E] to-[#BB5656]"></hr>
                                 </div>
                                 <div className='flex flex-col gap-4'>
@@ -68,7 +75,7 @@ export default function MenuPage() {
                                     <h2 className="font-primary text-3xl">00.99</h2>
                                 </div>
                                 <div className='translate-y-7'>
-                                    <button className="font-primary font-semibold text-2xl rounded-lg bg-gradient-to-r hover:bg-gradient-to-b from-[#CEA07E] to-[#BB5656] duration-400 transition-colors p-2">
+                                    <button className="font-primary font-semibold text-2xl rounded-lg bg-gradient-to-r hover:bg-gradient-to-b from-[#CEA07E] to-[#BB5656] p-2">
                                         Add to Cart
                                     </button>
                                 </div>

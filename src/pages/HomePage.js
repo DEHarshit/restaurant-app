@@ -15,7 +15,7 @@ export default function HomePage(){
             <div className="relative flex flex-col h-screen">
                 <div className="flex items-center justify-between p-5">
                     <div className="flex flex-col items-center ">
-                        <div className="font-primary font-bold tracking-wider">
+                        <div className="font-primary font-bold tracking-wider bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">
                             <h2>RESTAURANT</h2>
                         </div>
                         <div className="flex scale-[0.8]">
