@@ -30,7 +30,7 @@ export default function LogIn() {
                                 backgroundSize: "cover",
                                 backgroundPosition: "center"
                             }} className='h-[485px] w-[485px] rounded-l-lg bg-blue-100 border-r border-zinc-600'>
-                                <div className="rounded-l-lg w-full h-full bg-black hover:opacity-0 transition-all opacity-60 flex items-center justify-center text-7xl font-semibold tracking-wider">
+                                <div className="delay-300 duration-200 rounded-l-lg w-full h-full bg-black hover:opacity-0 transition-all opacity-60 flex items-center justify-center text-7xl font-semibold tracking-wider">
                                     LOG IN
                                 </div>
                             </div>
@@ -43,7 +43,7 @@ export default function LogIn() {
                                 </h2>
                                 <div>
                                     <span>
-                                        <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Name
                                             </span>
@@ -51,7 +51,7 @@ export default function LogIn() {
                                         <input type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
                                     </span>
                                     <span>
-                                        <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Password
                                             </span>
@@ -87,7 +87,7 @@ export default function LogIn() {
                                 </h2>
                                 <div >
                                     <span>
-                                        <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Name
                                             </span>
@@ -95,7 +95,7 @@ export default function LogIn() {
                                         <input type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
                                     </span>
                                     <span>
-                                        <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Email
                                             </span>
@@ -105,7 +105,7 @@ export default function LogIn() {
                                 </div>
                                 <div className="flex">
                                     <span>
-                                        <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Password
                                             </span>
@@ -118,7 +118,7 @@ export default function LogIn() {
                                         </span>
                                     </span>
                                     <span>
-                                        <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Confirm Password
                                             </span>
@@ -132,7 +132,7 @@ export default function LogIn() {
                                     </span>
                                 </div>
                                 <span>
-                                    <h2 className="bg-black p-1 w-fit h-fit translate-x-4 translate-y-4 rounded-lg font-semibold tracking-wide leading-4">
+                                    <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                         <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                             Phone Number
                                         </span>
@@ -149,7 +149,7 @@ export default function LogIn() {
                                 backgroundSize: "cover",
                                 backgroundPosition: "center"
                             }} className='h-[485px] w-[485px] rounded-r-lg bg-blue-100  border-l border-zinc-600'>
-                                <div className="rounded-r-lg w-full h-full bg-black hover:opacity-0 transition-all opacity-60 flex items-center justify-center text-7xl font-semibold tracking-wider">
+                                <div className="delay-300 duration-200 rounded-r-lg w-full h-full bg-black hover:opacity-0 transition-all opacity-60 flex items-center justify-center text-7xl font-semibold tracking-wider">
                                     SIGN IN
                                 </div>
                             </div>
