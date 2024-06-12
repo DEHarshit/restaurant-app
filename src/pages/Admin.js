@@ -13,12 +13,12 @@ export default function Admin() {
     const [currentPage, setCurrentPage] = useState(<Dashboard />);
     const [freeze, setFreeze] = useState(1);
     const menu = [
-        { title: 'Dashboard', id: 1 },
-        { title: 'Orders', id: 2 },
-        { title: 'Dishes', id: 3 },
-        { title: 'Users', id: 4 },
-        { title: 'Ingredients', id: 5 },
-        { title: 'Stock', id: 6 },
+        { title: 'Dashboard', id: 1, role: ['admin', 'chef', 'waiter', 'owner'] },
+        { title: 'Orders', id: 2, role: ['admin', 'chef', 'waiter', 'owner'] },
+        { title: 'Dishes', id: 3, role: ['admin', 'chef', 'waiter', 'owner'] },
+        { title: 'Users', id: 4, role: ['admin', 'owner'] },
+        { title: 'Ingredients', id: 5, role: ['admin', 'chef', 'owner'] },
+        { title: 'Stock', id: 6, role: ['admin', 'chef', 'owner'] },
     ]
     function handlePage(id) {
         console.log(id)
@@ -52,7 +52,7 @@ export default function Admin() {
         router.push('/LogIn')
     }
 
-    if (session?.user?.image === 'customer'){
+    if (session?.user?.image === 'customer') {
         router.push('/HomePage')
     }
 
@@ -112,11 +112,13 @@ export default function Admin() {
             </div>
             <div className='flex bg-zinc-900 w-screen overflow-hidden'>
                 <div className="h-screen flex flex-col border-r border-zinc-700 "> {/* left side */}
-                    {menu.map((ele, index) => (
-                        <div className={`hover:bg-zinc-700 flex w-[200px] h-[75px] bg-zinb-900 border-b border-zinc-700 transition-all  items-center justify-center`}>
-                            <button className={`${ele.id === freeze ? 'text-xl font-semibold bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text' : 'text-white hover:font-semibold hover:text-lg hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block hover:text-transparent bg-clip-text'} h-full w-full transition-all `} type="button" onClick={() => handlePage(ele.id)}>{ele.title}</button>
-                        </div>
-                    ))}
+                    {menu.map((ele, index) => {
+                        return ele.role.includes(session?.user?.image) ? (
+                            <div className={`hover:bg-zinc-700 flex w-[200px] h-[75px] bg-zinb-900 border-b border-zinc-700 transition-all  items-center justify-center`}>
+                                <button className={`${ele.id === freeze ? 'text-xl font-semibold bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text' : 'text-white hover:font-semibold hover:text-lg hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block hover:text-transparent bg-clip-text'} h-full w-full transition-all `} type="button" onClick={() => handlePage(ele.id)}>{ele.title}</button>
+                            </div>
+                        ) : null;
+                    })}
                 </div>
                 <div className='overflow-auto flex bg-black flex-grow'> {/* page */}
                     {currentPage}

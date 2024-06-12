@@ -93,7 +93,7 @@ export default function Stock() {
                                 </td>
                                 <td className='py-2'>
                                     <div className='flex justify-center'>
-                                        <button className='flex items-center justify-center space-x-3'>
+                                        <button className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-3'>
                                             <span className='text-red-700 text-2xl transition-all'>
                                                 -
                                             </span ><span className='text-lg'>Remove Stock</span>
