@@ -1,7 +1,7 @@
 export default function MenuCard({id,image,isveg,name,price,special,type}){
     return(
         <div className="p-1 bg-gradient-to-t bg-gradient-to-r from-[#CEA07E] to-[#BB5656] h-[456px] w-[356px] rounded-lg">
-            <div style={{height:"448px"}}className="flex flex-col p-6 justify-between rounded-lg bg-zinc-900 w-fit hover:-translate-y-3 transition-all duration-500 space-y-2">
+            <div style={{height:"448px"}}className="flex flex-col p-6 justify-between rounded-lg bg-zinc-900 w-fit hover:scale-[1] scale-[1.03] transition-all duration-300 space-y-2">
             <div  style={{
                         width:"300px",
                         height:"300px", 

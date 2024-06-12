@@ -1,14 +1,83 @@
-import { useState,useEffect } from "react"
+import { useRouter } from "next/router";
+import { useState, useEffect } from "react"
+import { signIn } from 'next-auth/react';
 
 export default function LogIn() {
+
     const [log, setLog] = useState(true);
     const [visible, setVisible] = useState(false);
-    const [transition,setTransition] = useState(false);
-    function handleLog(){
-        setTransition(true)
-        setTimeout(() => setLog(!log), 1000);
-        setTimeout(() => setTransition(false), 1500);
+    const [transition, setTransition] = useState(false);
+    const [users, setUsers] = useState([]);
+
+    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [cpassword, setCpassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
+
+    const [error, setError] = useState('');
+    const router = useRouter();
+
+    const handleLogIn = async (e) => {
+        e.preventDefault();
+        const user = users.find(e => e.NAME === name);
+        if (!user) {
+            setError("User not found");
+        } else {
+            if (user.PASSWORD === password) {
+                const result = signIn('credentials', { redirect: false, username: name, password: password, image: user.ROLE, email: user.EMAIL })
+                if (result.error) {
+                    setError(result.error)
+                } else {
+                    if (user.ROLE === 'customer') {
+                        setTimeout(() => router.push('/HomePage'), 500);
+                    } else {
+                        setTimeout(() => router.push('/Admin'), 500);
+                    }
+                }
+            } else {
+                setError("Incorrect Password");
+            }
+        }
+    };
+
+    const handleSignUp = async (e) => {
+        e.preventDefault();
     }
+
+    async function getUsers() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users`, postData);
+        const response = await res.json();
+        setUsers(response.users);
+        console.log(response.users);
+    }
+
+    function handleLog() {
+        setTransition(true)
+        setTimeout(() => {
+            setLog(!log)
+            setName('');
+            setPassword('');
+            setCpassword('');
+            setEmail('');
+            setPhone('');
+        }, 1000);
+        setTimeout(() => setTransition(false), 1500);
+
+    }
+
+    useEffect(() => {
+        getUsers();
+    }, [])
+
+
     return (
         <div className="relative h-screen flex justify-center items-center">
             <div className='fixed inset-0 animate-pulse'>
@@ -48,7 +117,7 @@ export default function LogIn() {
                                                 Name
                                             </span>
                                         </h2>
-                                        <input type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
+                                        <input type="text" value={`${name}`} onChange={(e) => setName(e.target.value)} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
                                     </span>
                                     <span>
                                         <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
@@ -57,7 +126,7 @@ export default function LogIn() {
                                             </span>
                                         </h2>
                                         <span className="flex">
-                                            <input type={`${visible ? 'text' : 'password'}`} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
+                                            <input value={`${password}`} onChange={(e) => setPassword(e.target.value)} type={`${visible ? 'text' : 'password'}`} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
                                             <button type="button" onClick={() => setVisible(!visible)} className="w-[30px] h-[30px] -translate-x-10 translate-y-2">
                                                 <img src={`${visible ? '/visible_on.png' : '/visible_off.png'}`} />
                                             </button>
@@ -71,8 +140,9 @@ export default function LogIn() {
                                     </span>
                                 </div>
                                 <div className="flex flex-col space-y-2 justify-center items-center">
-                                    <button type="button" className=" w-fit h-fit bg-zinc-400 hover:text-white text-lg text-black p-2 px-10 font-semibold transition-all duration-400 hover:text-xl rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">Log In</button>
-                                    <button type="button" className="text-zinc-400" onClick={handleLog}>Sign in?</button>
+                                    <h2 className="text-red-600">{error}</h2>
+                                    <button onClick={handleLogIn} type="button" className=" w-fit h-fit bg-zinc-400 hover:text-white text-lg text-black p-2 px-10 font-semibold transition-all duration-400 hover:text-xl rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">Log In</button>
+                                    <button type="button" className="text-zinc-400 hover:text-[20px] transition-all" onClick={handleLog}>Sign up?</button>
                                 </div>
                             </div>
                         </div>
@@ -83,7 +153,7 @@ export default function LogIn() {
                                     <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                         SIGN
                                     </span>
-                                    <span>IN</span>
+                                    <span>UP</span>
                                 </h2>
                                 <div >
                                     <span>
@@ -92,7 +162,7 @@ export default function LogIn() {
                                                 Name
                                             </span>
                                         </h2>
-                                        <input type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
+                                        <input value={`${name}`} onChange={(e) => setName(e.target.value)} type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
                                     </span>
                                     <span>
                                         <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
@@ -100,13 +170,13 @@ export default function LogIn() {
                                                 Email
                                             </span>
                                         </h2>
-                                        <input type="email" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
+                                        <input value={`${email}`} onChange={(e) => setEmail(e.target.value)} type="email" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
                                     </span>
                                 </div>
                                 <div className="flex">
                                     <span>
                                         <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
-                                            <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
+                                            <span value={`${password}`} onChange={(e) => setPassword(e.target.value)} className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
                                                 Password
                                             </span>
                                         </h2>
@@ -123,7 +193,7 @@ export default function LogIn() {
                                                 Confirm Password
                                             </span>
                                         </h2>
-                                        <span className="flex">
+                                        <span value={`${cpassword}`} onChange={(e) => setCpassword(e.target.value)} className="flex">
                                             <input type={`${visible ? 'text' : 'password'}`} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
                                             <button type="button" onClick={() => setVisible(!visible)} className="w-[30px] h-[30px] -translate-x-10 translate-y-2">
                                                 <img src={`${visible ? '/visible_on.png' : '/visible_off.png'}`} />
@@ -137,11 +207,11 @@ export default function LogIn() {
                                             Phone Number
                                         </span>
                                     </h2>
-                                    <input type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
+                                    <input value={`${phone}`} onChange={(e) => setPhone(e.target.value)} type="text" className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[200px] rounded-lg" />
                                 </span>
                                 <div className="flex flex-col translate-y-4 space-y-2 justify-center items-center">
-                                    <button type="button" className=" w-fit h-fit bg-zinc-400 text-lg text-black hover:text-white p-2 px-10 font-semibold transition-all duration-400 hover:text-xl rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">Sign In</button>
-                                    <button type="button" className="text-zinc-400" onClick={handleLog}>Log in?</button>
+                                    <button type="button" className=" w-fit h-fit bg-zinc-400 text-lg text-black hover:text-white p-2 px-10 font-semibold transition-all duration-400 hover:text-xl rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">Sign Up</button>
+                                    <button type="button" className="text-zinc-400 hover:text-[20px] transition-all" onClick={handleLog}>Log in?</button>
                                 </div>
                             </div>
                             <div style={{
@@ -150,7 +220,7 @@ export default function LogIn() {
                                 backgroundPosition: "center"
                             }} className='h-[485px] w-[485px] rounded-r-lg bg-blue-100  border-l border-zinc-600'>
                                 <div className="delay-300 duration-200 rounded-r-lg w-full h-full bg-black hover:opacity-0 transition-all opacity-60 flex items-center justify-center text-7xl font-semibold tracking-wider">
-                                    SIGN IN
+                                    SIGN UP
                                 </div>
                             </div>
                         </div>

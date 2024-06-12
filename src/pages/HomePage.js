@@ -1,6 +1,24 @@
 import Link from 'next/link'
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { useRouter } from "next/router";
 
 export default function HomePage(){
+    const { data: session, status } = useSession();
+
+    if (status === 'loading') {
+        return (
+            <div>
+                Loading...
+            </div>
+        )
+    }
+
+    const router = useRouter();
+
+    if (!session) {
+        router.push('/LogIn')
+    }
+
     return(
         <div className="relative flex flex-col h-screen">
             <div style={{backgroundImage: `url(/home-image.jpg)`, 
@@ -36,16 +54,30 @@ export default function HomePage(){
 
                     </div>
                     <div>
-                        <div className="flex items-center gap-5">
-                            <div style={{backgroundImage: `url(/home-image.jpg)`, 
-                                        backgroundPosition: "center", 
-                                        backgroundSize: "cover"}} 
-                                className="w-14 h-14 rounded-full">
-                            </div>
-                            <span className="font-primary tracking-wider">
-                                Username
+                    <div className="flex space-x-3 items-center">
+                    <div className="flex items-center gap-5">
+                        <div style={{
+                            backgroundImage: `url(/home-image.jpg)`,
+                            backgroundPosition: "center",
+                            backgroundSize: "cover"
+                        }}
+                            className="w-14 h-14 rounded-full">
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="font-primary tracking-wider text-xl">
+                                {session?.user?.name}
+                            </span>
+                            <span className="text-md text-zinc-700">
+                                {session?.user?.image.toUpperCase()}
                             </span>
                         </div>
+                    </div>
+
+                    <button onClick={signOut} type="button" className="scale-[0.9] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
+                        Sign Out
+                    </button>
+
+                </div>
                     </div>
                 </div>
                 <div className="flex flex-col items-center justify-center py-32 gap-8">

@@ -2,8 +2,12 @@ import Link from 'next/link'
 import MenuCard from './components/MenuCard'
 import Header from './components/Header'
 import { useState, useEffect } from 'react'
+import { signIn, signOut, useSession } from 'next-auth/react';
+import { useRouter } from "next/router";
 
 export default function MenuPage() {
+
+    const { data: session, status } = useSession();
 
     const [dishes, setDishes] = useState([]);
 
@@ -23,6 +27,21 @@ export default function MenuPage() {
     useEffect(() => {
         getDishes();
     }, [])
+
+    if (status === 'loading') {
+        return (
+            <div>
+                Loading...
+            </div>
+        )
+    }
+
+    const router = useRouter();
+
+    if (!session) {
+        router.push('/LogIn')
+    }
+
 
 
     return (
@@ -58,7 +77,7 @@ export default function MenuPage() {
                                 <div className='flex flex-col space-y-2'>
                                     <div className='font-primary leading-9 tracking-widest text-lg space-x-2'>
                                         <span>
-                                        Today's
+                                            Today's
                                         </span>
                                         <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text ">
                                             Special

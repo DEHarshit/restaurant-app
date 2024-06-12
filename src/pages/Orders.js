@@ -1,6 +1,6 @@
 export default function Orders(){
     return(
-        <div className="flex items-center bg-black justify-center flex-grow">
+        <div className="flex bg-black justify-center w-screen items-center">
             Orders
         </div>
     )
