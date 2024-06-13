@@ -35,6 +35,7 @@ export default function Ingredients() {
         setSelect([]);
         setMode('');
     }
+    
     function handleEdit(index) {
         setModal(true)
         setMode('edit');
@@ -127,7 +128,7 @@ export default function Ingredients() {
                         </tr>
                     </thead>
                     {ingredients.map((ele, index) => (
-                        <tbody key={index} className='border-b border-zinc-700'>
+                        <tbody key={index} className='border-b border-zinc-700 hover:bg-[#202022] transition-all'>
                             <tr>
                                 <td className='p-3'>
                                     <div className='flex justify-center'>

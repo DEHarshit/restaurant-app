@@ -1,13 +1,62 @@
 import { useState, useEffect } from 'react'
-
+import StockModal from './components/StockModal'
 
 export default function Stock() {
 
+    const [mode, setMode] = useState('');
+    const [select, setSelect] = useState([]);
+
+    const [modal, setModal] = useState(false);
+    const [ind, setInd] = useState(0);
+
     const [stock, setStock] = useState([
-        { NAME: "test", QTY: "0.3", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-        { NAME: "test2", QTY: "0.1", UOM: "litre", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-        { NAME: "test3", QTY: "0.8", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
+        { ID: 1, NAME: "test1", QTY: "0.3", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
+        { ID: 2, NAME: "test2", QTY: "0.1", UOM: "litre", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
+        { ID: 3, NAME: "test3", QTY: "0.8", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
     ])
+
+    async function handleSaveChanges() {
+        if (select.length === 0) {
+            handleCancel();
+        } else {
+
+        }
+    }
+
+    function handleCancel() {
+        setSelect([]);
+        setMode('');
+    }
+
+    function handleRemove(key) {
+        if (mode === '') {
+            setMode('remove')
+            setSelect(sel => [...sel, key])
+        }
+        if (mode === 'remove') {
+            if (!select.includes(key)) {
+                setSelect(sel => [...sel, key])
+
+            } else {
+                setSelect(sel => {
+                    return sel.filter(ele => ele !== key)
+                })
+            }
+            console.log(select)
+        }
+
+    }
+
+    function handleEdit(index) {
+        setModal(true)
+        setMode('edit');
+        setInd(index)
+    }
+
+    function handleAdd() {
+        setModal(true)
+        setMode('add');
+    }
 
     return (
         <div className="flex bg-black justify-center w-screen  ">
@@ -15,10 +64,10 @@ export default function Stock() {
                 <div className='text-3xl font-semibold tracking-widest leading-8'>
                     <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>STO</span>CK
                 </div>
-                <table className="bg-zinc-900 rounded-2xl w-[1500px] ">
+                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
                     <thead className='border-b border-white'>
                         <tr>
-                            <th className=' py-2 '>
+                            <th className=' py-2 w-[100px]'>
                                 <div className='flex justify-center'>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
                                         Serial No.
@@ -26,13 +75,10 @@ export default function Stock() {
                                 </div>
                             </th>
                             <th className=''>
-                                <div className='flex justify-center'>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Name
-                                    </span>
-                                </div>
+                                        Ingredient</span> Name
                             </th>
-                            <th className=''>
+                            <th className=' w-[100px]'>
                                 <div className='flex justify-center'>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
                                         Quantity
@@ -42,17 +88,17 @@ export default function Stock() {
                             <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
                                 UO</span>M
                             </th>
-                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
                                 Supplied
                             </span> Date
                             </th>
-                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
                                 Expiry
                             </span> Date
                             </th>
-                            <th className=''>
-                                <div className='flex justify-center'>
-                                    <button className='flex items-center justify-center space-x-3'>
+                            <th className='w-[325px]'>
+                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
                                         <span className='text-green-700 text-2xl transition-all'>
                                             +
                                         </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
@@ -63,7 +109,7 @@ export default function Stock() {
                         </tr>
                     </thead>
                     {stock.map((ele, index) => (
-                        <tbody className='border-b border-zinc-700'>
+                        <tbody className='border-b border-zinc-700 hover:bg-[#202022] transition-all'>
                             <tr key={index}>
                                 <td className='flex justify-center py-2'>{index + 1}</td>
                                 <td className=''>
@@ -91,20 +137,53 @@ export default function Stock() {
                                         {ele.EXP_DATE}
                                     </div>
                                 </td>
-                                <td className='py-2'>
-                                    <div className='flex justify-center'>
-                                        <button className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-3'>
-                                            <span className='text-red-700 text-2xl transition-all'>
-                                                -
-                                            </span ><span className='text-lg'>Remove Stock</span>
-                                        </button>
-                                    </div>
+                                <td className=''>
+                                    {mode !== 'remove'
+                                        ? <div className='flex justify-center space-x-8'>
+                                            <button onClick={() => handleEdit(index)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-blue-700 text-2xl transition-all'>
+                                                    +
+                                                </span ><span className='text-lg'>Edit</span>
+                                            </button>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className='flex justify-center'>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                    }
                                 </td>
                             </tr>
                         </tbody>
                     ))}
                 </table>
             </div>
+            {mode === 'remove' ?
+                <div className='p-3 fixed bottom-0 right-0 '>
+                    <div className='space-x-10 py-7 px-7 bg-zinc-700 rounded-lg bg-opacity-40'>
+                        <button onClick={handleSaveChanges} type="button" className='hover:scale-[1.1] transition-all bg-green-600 text-lg p-1 rounded-full px-2'>
+                            Save Changes
+                        </button>
+                        <button onClick={handleCancel} type="button" className='hover:scale-[1.1] transition-all bg-zinc-600 text-lg p-1 rounded-full px-2'>
+                            Cancel
+                        </button>
+                    </div>
+                </div> : null
+            }
+            <StockModal
+                isVisible={modal}
+                mode={mode}
+                setModal={setModal}
+                setMode={setMode}
+            />
         </div>
     )
 }

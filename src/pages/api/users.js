@@ -13,7 +13,7 @@ export default async function handler(req, res) {
             const { name, password, email, phone } = req.body;
             const addUser = await query({
                 query: "INSERT INTO USERS (NAME,PASSWORD,PREVPASS,ROLE,EMAIL,PHONE) VALUES (?,?,?,?,?,?)",
-                values: [name, password, password, "customer", email, phone]
+                values: [name, password, password, "Customer", email, phone]
             })
             res.status(200).json({ success: true });
         } catch (error) {

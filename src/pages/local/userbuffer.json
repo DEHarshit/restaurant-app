@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "name": "Admin",
+        "password": "123123",
+        "prevpass": "123123",
+        "role": "Admin",
+        "email": "admin123@gmail.com",
+        "phone": "9098978767"
+    },
+    {
+        "id": 2,
+        "name": "Chef",
+        "password": "123123",
+        "prevpass": "123123",
+        "role": "Chef",
+        "email": "chef123@gmail.com",
+        "phone": "9998808652"
+    },
+    {
+        "id": 3,
+        "name": "Customer",
+        "password": "123123",
+        "prevpass": "123123",
+        "role": "Customer",
+        "email": "customer123@gmail.com",
+        "phone": "9875789068"
+    }
+]

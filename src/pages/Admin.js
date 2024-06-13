@@ -13,12 +13,12 @@ export default function Admin() {
     const [currentPage, setCurrentPage] = useState(<Dashboard />);
     const [freeze, setFreeze] = useState(1);
     const menu = [
-        { title: 'Dashboard', id: 1, role: ['admin', 'chef', 'waiter', 'owner'] },
-        { title: 'Orders', id: 2, role: ['admin', 'chef', 'waiter', 'owner'] },
-        { title: 'Dishes', id: 3, role: ['admin', 'chef', 'waiter', 'owner'] },
-        { title: 'Users', id: 4, role: ['admin', 'owner'] },
-        { title: 'Ingredients', id: 5, role: ['admin', 'chef', 'owner'] },
-        { title: 'Stock', id: 6, role: ['admin', 'chef', 'owner'] },
+        { title: 'Dashboard', id: 1, role: ['Admin', 'Chef', 'Waiter', 'Owner'] },
+        { title: 'Orders', id: 2, role: ['Admin', 'Chef', 'Waiter', 'Owner'] },
+        { title: 'Dishes', id: 3, role: ['Admin', 'Chef', 'Waiter', 'Owner'] },
+        { title: 'Users', id: 4, role: ['Admin', 'Owner'] },
+        { title: 'Ingredients', id: 5, role: ['Admin', 'Chef', 'Owner'] },
+        { title: 'Stock', id: 6, role: ['Admin', 'Chef', 'Owner'] },
     ]
     function handlePage(id) {
         console.log(id)
