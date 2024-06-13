@@ -16,6 +16,9 @@ export default function AddDish() {
 
     const [ingredients, setIngredients] = useState([]);
 
+    const [error, setError] = useState('');
+    const [color, setColor] = useState('text-red-800');
+
 
     async function getIngredients() {
         const postData = {
@@ -49,6 +52,7 @@ export default function AddDish() {
         setIsVeg(false);
         setDishIngredients([]);
         setDishQty([]);
+        setError('');
     }
 
     function addIngredient() {
@@ -68,6 +72,10 @@ export default function AddDish() {
         }
         if (nextIndex <= formData.length) {
             setIndex(nextIndex);
+            setError('');
+        } else {
+            setError('You are at the end!')
+            setColor('text-red-800')
         }
     }
 
@@ -78,6 +86,10 @@ export default function AddDish() {
         }
         if (prevIndex >= 0) {
             setIndex(prevIndex);
+            setError('');
+        } else {
+            setError('You are at the start!')
+            setColor('text-red-800')
         }
     }
 
@@ -102,84 +114,212 @@ export default function AddDish() {
     }
 
     function handleSave() {
-        const Data = {
-            index: index,
-            image: image,
-            name: dishName,
-            type: dishTimings,
-            price: dishPrice,
-            ing: dishIngredients,
-            qty: dishQty,
-            isveg: isVeg
-        }
-        return new Promise(async (resolve, reject) => {
-            if (index == formData.length) {
-                setFormData(oldData => [...oldData, Data]);
-                try {
-                    await saveData();
-                    resolve();
-                } catch (error) {
-                    reject(error);
+        if (dishName === '') {
+            const Data = {
+                index: index,
+                image: image,
+                name: dishName,
+                type: dishTimings,
+                price: dishPrice,
+                ing: dishIngredients,
+                qty: dishQty,
+                isveg: isVeg
+            }
+            return new Promise(async (resolve, reject) => {
+                if (index == formData.length) {
+                    setFormData(oldData => [...oldData, Data]);
+                    try {
+                        await saveData();
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            });
+            async function saveData() {
+                const postData = {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify(Data)
+                };
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
+                console.log(response)
+                if (response.status == 200) {
+                    setError('Data Created Successfully')
+                    setColor('text-green-600');
+                } else {
+                    setError('There was an error')
+                    setColor('text-red-800');
                 }
             }
-        });
-        async function saveData() {
-            const postData = {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json",
-                },
-                body: JSON.stringify(Data)
-            };
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
-            console.log(response)
+        } else if (dishName !== '') {
+            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === '' || dishQty == '') {
+                setError('Fill All the Possible Fields')
+                setColor('text-red-800');
+            } else {
+                const Data = {
+                    index: index,
+                    image: image,
+                    name: dishName,
+                    type: dishTimings,
+                    price: dishPrice,
+                    ing: dishIngredients,
+                    qty: dishQty,
+                    isveg: isVeg
+                }
+                return new Promise(async (resolve, reject) => {
+                    if (index == formData.length) {
+                        setFormData(oldData => [...oldData, Data]);
+                        try {
+                            await saveData();
+                            resolve();
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }
+                });
+                async function saveData() {
+                    const postData = {
+                        method: "POST",
+                        headers: {
+                            "Content-type": "application/json",
+                        },
+                        body: JSON.stringify(Data)
+                    };
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
+                    console.log(response)
+                    if (response.status == 201) {
+                        setError('Data Created Successfully')
+                        setColor('text-green-600');
+                    } else {
+                        setError('There was an error')
+                        setColor('text-red-800');
+                    }
+                }
+            }
         }
+
 
     }
 
     function handleUpdate() {
-        const Data = {
-            image: image,
-            name: dishName,
-            type: dishTimings,
-            price: dishPrice,
-            ing: dishIngredients,
-            qty: dishQty,
-            isveg: isVeg,
-            index: index
-        }
-        return new Promise(async (resolve, reject) => {
-            if (index <= formData.length) {
-                setFormData(oldData => [...oldData.slice(0, index), Data, ...oldData.slice(index + 1)]);
-                try {
-                    await updateData();
-                    resolve();
-                } catch (error) {
-                    reject(error);
+        if (dishName === '') {
+            const Data = {
+                image: image,
+                name: dishName,
+                type: dishTimings,
+                price: dishPrice,
+                ing: dishIngredients,
+                qty: dishQty,
+                isveg: isVeg,
+                index: index
+            }
+            return new Promise(async (resolve, reject) => {
+                if (index <= formData.length) {
+                    setFormData(oldData => [...oldData.slice(0, index), Data, ...oldData.slice(index + 1)]);
+                    try {
+                        await updateData();
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            });
+            async function updateData() {
+                const postData = {
+                    method: "PUT",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify(Data)
+                };
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
+                console.log(response)
+                if (response.status == 201) {
+                    setError('Data Updated Successfully')
+                    setColor('text-green-600');
+                } else {
+                    setError('There was an error')
+                    setColor('text-red-800');
                 }
             }
-        });
-        async function updateData() {
-            const postData = {
-                method: "PUT",
-                headers: {
-                    "Content-type": "application/json",
-                },
-                body: JSON.stringify(Data)
-            };
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
-            console.log(response)
+        } else if (dishName !== '') {
+            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === ''  || dishQty == '') {
+                setError('Fill All the Possible Fields')
+                setColor('text-red-800');
+            } else {
+                const Data = {
+                    image: image,
+                    name: dishName,
+                    type: dishTimings,
+                    price: dishPrice,
+                    ing: dishIngredients,
+                    qty: dishQty,
+                    isveg: isVeg,
+                    index: index
+                }
+                return new Promise(async (resolve, reject) => {
+                    if (index <= formData.length) {
+                        setFormData(oldData => [...oldData.slice(0, index), Data, ...oldData.slice(index + 1)]);
+                        try {
+                            await updateData();
+                            resolve();
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }
+                });
+                async function updateData() {
+                    const postData = {
+                        method: "PUT",
+                        headers: {
+                            "Content-type": "application/json",
+                        },
+                        body: JSON.stringify(Data)
+                    };
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
+                    console.log(response)
+                    if (response.status == 201) {
+                        setError('Data Updated Successfully')
+                        setColor('text-green-600');
+                    } else {
+                        setError('There was an error')
+                        setColor('text-red-800');
+                    }
+                }
+            }
+
+
         }
     }
 
     async function handleCommit() {
-        if (index <= formData.length) {
-            await handleUpdate();
+        if (dishName === '') {
+            if (index <= formData.length) {
+                await handleUpdate();
+            }
+            if (index == formData.length) {
+                await handleSave();
+            }
+            await commitData();
+        } else if (dishName !== '') {
+            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === ''  || dishQty == '') {
+                setError('Fill All the Possible Fields')
+                setColor('text-red-800');
+            } else {
+                if (index <= formData.length) {
+                    await handleUpdate();
+                }
+                if (index == formData.length) {
+                    await handleSave();
+                }
+                await commitData();
+            }
+
         }
-        if (index == formData.length) {
-            await handleSave();
-        }
-        await commitData();
+
     }
 
     async function commitData() {
@@ -191,6 +331,13 @@ export default function AddDish() {
         };
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dishes`, postData);
         console.log(response)
+        if (response.status == 200) {
+            setError('Data Committed Successfully')
+            setColor('text-green-600');
+        } else {
+            setError('There was an error')
+            setColor('text-red-800');
+        }
     }
 
     const updateIngredients = key => e => {
@@ -211,7 +358,7 @@ export default function AddDish() {
     }, [])
 
     useEffect(() => {
-        console.log(index+1)
+        console.log(index + 1)
         if (index + 1 <= formData.length) {
             if (ingredients && formData && formData[index]) {
                 (formData[index].image === "")
@@ -311,7 +458,7 @@ export default function AddDish() {
                                                         }
                                                     </select>
                                                     <input value={`${dishQty[index]}`} onChange={updateQuantity(index)} type='number' placeholder='Enter Quantity' className='w-[120px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-1 text-black rounded-lg' />
-                                                    <label>kg/liters</label>
+                                                    <label>g/ml</label>
                                                 </div>
                                             )) : null}
                                         </div>
@@ -326,6 +473,11 @@ export default function AddDish() {
                             </div>
 
                         </div>
+                    </div>
+                    <div className='flex items-center justify-center -translate-y-3'>
+                        <h2 className={`${error !== '' ? 'text-lg opacity-100' : 'text-2xl opacity-0'} transition-all font-semibold ${color}`}>
+                            {error !== '' ? `${error}` : null}
+                        </h2>
                     </div>
                     <div className='flex items-center justify-center space-x-3 rounded-xl -translate-y-1'>
                         <button type="button" className='bg-cyan-800 hover:bg-cyan-900 transition-all duration-300 p-2 rounded-lg' onClick={() => handlePrev()}>Previous</button>

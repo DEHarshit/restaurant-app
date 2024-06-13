@@ -1,4 +1,5 @@
-export default function MenuCard({id,image,isveg,name,price,special,type}){
+export default function MenuCard({id,image,isveg,name,price,special,type,recipes}){
+    const ingredients = Array.isArray(recipes) ? recipes.slice(0,4) :[];
     return(
         <div className="p-1 bg-gradient-to-t bg-gradient-to-r from-[#CEA07E] to-[#BB5656] h-[456px] w-[356px] rounded-lg">
             <div style={{height:"448px"}}className="flex flex-col p-6 justify-between rounded-lg bg-zinc-900 w-fit hover:scale-[1] scale-[1.03] transition-all duration-300 space-y-2">
@@ -13,7 +14,13 @@ export default function MenuCard({id,image,isveg,name,price,special,type}){
             <div className="flex flex-col gap-3">
                 <div> {/* Title */}
                     <h2 className="font-primary text-xl font-semibold leading-5 tracking-wider antialiased transition-all duration-400 hover:text-[#BB5656]">{name ? name : "Dish Name"}</h2>
-                    <span className="text-[12px] text-zinc-500">Vegetables, cheeses, ground meats,...</span>
+                    <span className="flex text-[13px] text-zinc-500">
+                        {ingredients.map((ele)=>(
+                            <div>
+                                {ele.INAME},
+                            </div>
+                        ))}...
+                    </span>
                 </div>
                 <div className="flex justify-between items-center">
                     <div className="flex gap-1"> {/* Profile Pic & Name */}

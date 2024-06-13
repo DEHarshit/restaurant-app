@@ -7,9 +7,25 @@ import { useRouter } from "next/router";
 
 export default function MenuPage() {
 
+   
+
     const { data: session, status } = useSession();
 
     const [dishes, setDishes] = useState([]);
+
+    const [recipes, setRecipes] = useState([]);
+
+    async function getRecipes() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
+        const response = await res.json();
+        setRecipes(response.recipes);
+    }
 
     async function getDishes() {
         const postData = {
@@ -21,11 +37,11 @@ export default function MenuPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dishes`, postData);
         const response = await res.json();
         setDishes(response.dishes);
-        console.log(dishes)
     }
 
     useEffect(() => {
         getDishes();
+        getRecipes();
     }, [])
 
     if (status === 'loading') {
@@ -118,6 +134,7 @@ export default function MenuPage() {
                                             special={dish.SPECIAL}
                                             type={dish.TYPE}
                                             isveg={dish.ISVEG}
+                                            recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
                                         />
                                     </div>) : null
                             ))}

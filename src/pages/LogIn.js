@@ -30,10 +30,10 @@ export default function LogIn() {
                 if (result.error) {
                     setError(result.error)
                 } else {
-                    if (user.ROLE === 'customer') {
-                        setTimeout(() => router.push('/HomePage'), 500);
+                    if (user.ROLE === 'Customer') {
+                        setTimeout(() => router.push('/HomePage'), 200);
                     } else {
-                        setTimeout(() => router.push('/Admin'), 500);
+                        setTimeout(() => router.push('/Admin'), 200);
                     }
                 }
             } else {

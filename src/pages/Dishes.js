@@ -1,11 +1,28 @@
 import Link from 'next/link';
 import MenuCard from './components/MenuCard'
+import SpecialModal from './components/SpecialModal'
 import { useState, useEffect } from 'react'
 
 
 export default function Dishes() {
 
     const [dishes, setDishes] = useState([])
+
+    const [recipes, setRecipes] = useState([]);
+
+    const [modal, setModal] = useState(false);
+
+    async function getRecipes() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
+        const response = await res.json();
+        setRecipes(response.recipes);
+    }
 
     async function getDishes() {
         const postData = {
@@ -22,6 +39,7 @@ export default function Dishes() {
 
     useEffect(() => {
         getDishes();
+        getRecipes();
     }, [])
 
     /* bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text */
@@ -40,7 +58,7 @@ export default function Dishes() {
                         <hr className="w-[500px] h-0.5 border-0 bg-gradient-to-r from-[#CEA07E] to-[#BB5656]"></hr>
                     </div>
                     <div className='flex space-x-5 px-10'>
-                        <button type="button" className='bg-zinc-400 hover:text-white text-lg text-black p-2 px-10 font-semibold transition-all duration-400 hover:text-xl rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]'>
+                        <button onClick={()=>setModal(true)} type="button" className='bg-zinc-400 hover:text-white text-lg text-black p-2 px-10 font-semibold transition-all duration-400 hover:text-xl rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]'>
                             Change Today's Special
                         </button>
                         <Link href='/AddDish'>
@@ -61,10 +79,18 @@ export default function Dishes() {
                                 special={dish.SPECIAL}
                                 type={dish.TYPE}
                                 isveg={dish.ISVEG}
+                                recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
                             />
                         </div>
                     ))}
                 </div>
+            </div>
+            <div>
+                <SpecialModal
+                isVisible={modal}
+                setModal={setModal}
+                dishes={dishes}
+                />
             </div>
         </div>
     )

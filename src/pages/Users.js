@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 
 export default function Users() {
 
+    const passLength = 8;
+
     const [visible, setVisible] = useState(false);
 
     const [users, setUsers] = useState([]);
@@ -15,6 +17,11 @@ export default function Users() {
     const [phone, setPhone] = useState('');
     const [role, setRole] = useState('');
 
+    const [error, setError] = useState('');
+    const [color, setColor] = useState('text-red-800');
+
+    const [search, setSearch] = useState('');
+
     async function getUsers() {
         const postData = {
             method: "GET",
@@ -27,6 +34,27 @@ export default function Users() {
         setUsers(response);
     }
 
+    function randomPass() {
+        const charset = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        let newPass = "";
+        for (let i = 0; i < passLength; i++) {
+            newPass += charset.charAt(Math.floor(Math.random() * charset.length));
+
+        }
+        return newPass;
+    }
+
+    function handleSearch(){
+        setError('');
+        const user = users.findIndex((user)=>user.phone === search);
+        if (user !== -1){
+            setIndex(user);
+        } else {
+            setError('User Not Found');
+            setColor('text-red-800')
+        }
+    }
+
     function handleNext() {
         let nextIndex = index + 1;
         while (nextIndex < users.length && users[nextIndex].name === "") {
@@ -34,6 +62,10 @@ export default function Users() {
         }
         if (nextIndex <= users.length) {
             setIndex(nextIndex);
+            setError('');
+        } else {
+            setError('You are at the end!')
+            setColor('text-red-800')
         }
     }
 
@@ -44,16 +76,147 @@ export default function Users() {
         }
         if (prevIndex >= 0) {
             setIndex(prevIndex);
+            setError('');
+        } else {
+            setError('You are at the start!')
+            setColor('text-red-800')
         }
     }
 
     function clearForm() {
+        setError('')
         setId('-');
         setName('');
         setPassword('');
         setEmail('');
         setPhone('');
         setRole('');
+    }
+
+    function handleSave() {
+        if (name === '' || email === '' || phone === '' || role === '') {
+            setError('Fill All the Possible Fields')
+            setColor('text-red-800');
+        } else {
+            const newPass = randomPass();
+            const Data = {
+                id: index + 1,
+                name: name,
+                password: newPass,
+                prevpass: newPass,
+                role: role,
+                email: email,
+                phone: phone
+            }
+            return new Promise(async (resolve, reject) => {
+                if (index == users.length) {
+                    setUsers(oldData => [...oldData, Data]);
+                    try {
+                        await saveData();
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            });
+            async function saveData() {
+                const postData = {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify(Data)
+                };
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tempusers`, postData);
+                console.log(response)
+                if (response.status == 200){
+                    setError('Data Created Successfully')
+                    setColor('text-green-600');
+                } else {
+                    setError('There was an error')
+                    setColor('text-red-800');
+                }
+            }
+        }
+    }
+
+    function handleUpdate() {
+        if (name === '' || email === '' || phone === '' || role === '') {
+            setError('Fill All the Possible Fields')
+            setColor('text-red-800');
+        } else {
+            const Data = {
+                id: index + 1,
+                name: name,
+                password: password,
+                prevpass: password,
+                role: role,
+                email: email,
+                phone: phone
+            }
+            return new Promise(async (resolve, reject) => {
+                if (index <= users.length) {
+                    setUsers(oldData => [...oldData.slice(0, index), Data, ...oldData.slice(index + 1)]);
+                    try {
+                        await updateData();
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            });
+            async function updateData() {
+                const postData = {
+                    method: "PUT",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify(Data)
+                };
+                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tempusers`, postData);
+                console.log(response)
+                if (response.status == 201){
+                    setError('Data Updated Successfully')
+                    setColor('text-green-600');
+                } else {
+                    setError('There was an error')
+                    setColor('text-red-800');
+                }
+            }
+        }
+    }
+
+    async function handleCommit() {
+        if (name === '' || email === '' || phone === '' || role === '') {
+            setError('Fill All the Possible Fields')
+            setColor('text-red-800');
+        } else {
+            if (index <= users.length) {
+                await handleUpdate();
+            }
+            if (index == users.length) {
+                await handleSave();
+            }
+        }
+        await commitData();
+    }
+
+    async function commitData() {
+        const postData = {
+            method: "PUT",
+            headers: {
+                "Content-type": "application/json",
+            }
+        };
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users`, postData);
+        console.log(response)
+        if (response.status == 200){
+            setError('Data Committed Successfully')
+            setColor('text-green-600');
+        } else {
+            setError('There was an error')
+            setColor('text-red-800');
+        }
     }
 
     useEffect(() => {
@@ -93,9 +256,9 @@ export default function Users() {
                                     Search by Phone Number
                                 </span>
                             </h2>
-                            <input type="text" className="p-1 border bg-black border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
+                            <input value={search} onChange={(e)=>setSearch(e.target.value)} type="text" className="p-1 border bg-black border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
                         </div>
-                        <button><img className="w-[40px] h-[40px] translate-y-3 " src="/search.png" /></button>
+                        <button type="button" onClick={handleSearch}><img className="w-[40px] h-[40px] translate-y-3 " src="/search.png" /></button>
                     </div>
                 </div>
                 <div className="flex">
@@ -176,6 +339,11 @@ export default function Users() {
                             </div>
                         </div>
                     </div>
+                </div>
+                <div>
+                    <h2 className={`${error !== '' ? 'text-lg opacity-100':'text-2xl opacity-0'} transition-all font-semibold ${color}`}>
+                        {error !== '' ? `${error}` : null}
+                    </h2>
                 </div>
                 <div className='flex items-center justify-center space-x-3 rounded-xl -translate-y-1'>
                     <button type="button" className='bg-cyan-800 hover:bg-cyan-900 transition-all duration-300 p-2 rounded-lg' onClick={() => handlePrev()}>Previous</button>

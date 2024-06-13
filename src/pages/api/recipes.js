@@ -11,11 +11,11 @@ export default async function handler(req, res) {
         
         const { id } = req.body;
 
-        const dishes = await query({
-            query: "SELECT INAME,QTY,UOM FROM RECIPES R,INGREDIENTS I WHERE R.DID=? AND I.NAME=R.INAME",
+        const recipes = await query({
+            query: "SELECT DID,INAME,QTY,UOM FROM RECIPES R,INGREDIENTS I WHERE I.NAME=R.INAME",
             values: [id || 1]
         })
-        res.status(200).json({ dishes });
+        res.status(200).json({ recipes });
     }
 
 }
