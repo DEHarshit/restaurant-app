@@ -1,85 +1,92 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
-export default function CartModal({ isVisible, setModal,cart,setCart,qty,setQty }) {
-
-    const [special, setSpecial] = useState(0);
-/* 
-    const [cart, setCart] = useState([]);
-    const [qty, setQty] = useState([]);
- */
+export default function CartModal({ isVisible, setModal, cart, setCart, qty, setQty }) {
 
     function handleClose() {
         setModal(false);
     }
 
-    function handleSave() {
-        handleClose();
+    function handleAdd(index) {
+        const newQty = [...qty];
+        newQty[index] += 1;
+        setQty(newQty);
     }
 
-    function handleAdd(index) {
-        const oldQty = [...qty];
-        oldQty[index] = oldQty[index] + 1;
-        setQty(oldQty);
-    }
+    function handleCancel(){
+        setCart([])
+        setQty([])
+        }
 
     function handleReduce(index) {
-        const oldQty = [...qty];
-        if (oldQty[index] == 1) {
-            setCart((oldCart)=>oldCart.filter((ele,ind)=>ind!==index))
-            setQty((oldQty)=>oldQty.filter((ele,ind)=>ind!==index))
+        if (qty[index] === 1) {
+            // Remove item from cart if quantity is reduced to zero
+            setCart((prevCart) => prevCart.filter((_, ind) => ind !== index));
+            setQty((prevQty) => prevQty.filter((_, ind) => ind !== index));
         } else {
-            oldQty[index] = oldQty[index] - 1;
-            setQty(oldQty);
+            const newQty = [...qty];
+            newQty[index] -= 1;
+            setQty(newQty);
         }
     }
 
-    /* useEffect(() => {
-        if (typeof window !== 'undefined') {
-            sessionStorage.setItem("Cart", JSON.stringify(cart));
-            sessionStorage.setItem("Qty", JSON.stringify(qty));
-        }
-    }, [cart, qty]);
+    if (!isVisible) return null;
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const storedCart = sessionStorage.getItem('Cart');
-            setCart(storedCart ? JSON.parse(storedCart) : [])
-            const storedQty = sessionStorage.getItem('Qty');
-            setQty(storedQty ? JSON.parse(storedQty) : [])
-        } else {
-            setCart([]);
-            setQty([]);
-        }
-    }, [isVisible]) */
-
-    if (!isVisible) return null
     return (
         <div className="flex justify-center items-center fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm">
-            <div className="relative w-[1200px] h-[680px] bg-zinc-900 bg-opacity-70 rounded-xl">
-                <div className="font-bold text-3xl right-0 absolute p-3 px-6 hover:scale-[1.1] transition-all">
-                    <button onClick={handleClose} type="button">
+            <div className="relative w-[1000px] h-[600px] bg-zinc-900 bg-opacity-70 rounded-xl p-6 overflow-auto">
+                <div className="flex justify-between items-center mb-4"><div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text text-3xl font-primary font-bold text-center">
+                                SHOPPING CART
+                </div>
+
+                    <button onClick={handleClose} className="text-2xl text-white hover:text-gray-300">
                         X
                     </button>
                 </div>
-                <div className="flex flex-col">
-                    {cart.map((item, index) => (
-                        <div key={index} className="flex space-x-2">
-                            <h2>
-                                {item}
-                            </h2>
-                            <h2>
-                                {qty[index]}
-                            </h2>
-                            <button type="button" onClick={(e) => handleAdd(index)} className="text-xl text-green-900">
-                                +
-                            </button>
-                            <button type="button" onClick={(e) => handleReduce(index)} className="text-xl text-red-900">
-                                -
-                            </button>
-                        </div>
-                    ))}
+                <div className="overflow-y-auto">
+                <table className="w-full">
+                        <thead>
+                            <tr className="border-b border-gray-500">
+                                <th className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text py-2 px-4 text-left text-2xl">
+                                    DISH
+                                </th>
+                                <th className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text py-2 px-4 text-left text-2xl">
+                                    QUANTITY
+                                </th>
+                                <th className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text py-2 px-4 text-left text-2xl">
+                                    ACTIONS
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {cart.map((item, index) => (
+                                <tr key={index} className="border-b border-gray-300">
+                                    <td className="py-2 px-4 text-lg ">{item}</td>
+                                    <td className="py-2 px-4 text-lg ">{qty[index]}</td>
+                                    <td className="py-2 px-4 space-x-4">
+                                        <button onClick={() => handleAdd(index)} className="text-2xl text-green-600 hover:text-green-800 mr-2">
+                                            + <span className='text-2xl text-lg text-white'>ADD</span>
+                                        </button>
+                                        <button onClick={() => handleReduce(index)} className="text-2xl text-red-600 hover:text-red-800">
+                                            - <span className='text-2xl text-lg text-white'>REMOVE</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                </table>
+
+                <div className="flex justify-end mt-4">
+                <button className="text-white text-lg px-4 py-2 rounded-md mr-4 bg-gradient-to-t from-[#CEA07E] to-[#BB5656] hover:from-[#BB5656] hover:to-[#CEA07E] hover:text-white hover:bg-gradient-to-t hover:bg-gradient-to-b">
+    Place Order
+</button>
+
+ <button onClick={() => handleCancel()} className="text-white text-lg px-4 py-2 rounded-md mr-4 bg-gradient-to-t from-[#CEA07E] to-[#BB5656] hover:from-[#BB5656] hover:to-[#CEA07E] hover:text-white hover:bg-gradient-to-t hover:bg-gradient-to-b">
+                            Cancel
+                        </button>
+                </div>
+
                 </div>
             </div>
         </div>
-    )
+    );
 }
