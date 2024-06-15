@@ -4,6 +4,7 @@ import Header from './components/Header'
 import { useState, useEffect } from 'react'
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useRouter } from "next/router";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 export default function MenuPage() {
 
@@ -16,6 +17,8 @@ export default function MenuPage() {
     const [recipes, setRecipes] = useState([]);
 
     const [special, setSpecial] = useState(null);
+
+    const [search, setSearch] = useState('');
 
     const [cart, setCart] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -34,6 +37,17 @@ export default function MenuPage() {
             return [];
         }
     });
+
+    const {
+        transcript,
+        listening,
+        resetTranscript
+      } = useSpeechRecognition();
+
+    const handleSpeechRecognition = () => {
+        SpeechRecognition.startListening({ continuous: true });
+    };
+
 
     async function getRecipes() {
         const postData = {
@@ -77,7 +91,9 @@ export default function MenuPage() {
             sessionStorage.setItem("Cart", JSON.stringify(cart));
             sessionStorage.setItem("Qty", JSON.stringify(qty));
         }
-    }, [cart,qty]);
+    }, [cart, qty]);
+
+    useEffect(()=>{transcript ? setSearch(transcript) : ''},[transcript])
 
 
     if (status === 'loading') {
@@ -103,11 +119,11 @@ export default function MenuPage() {
     return (
         <div>
             <div className="fixed sticky z-20 top-0 bg-zinc-900 bg-opacity-30">
-                <Header 
-                cart={cart}
-                setCart={setCart}
-                qty={qty}
-                setQty={setQty}
+                <Header
+                    cart={cart}
+                    setCart={setCart}
+                    qty={qty}
+                    setQty={setQty}
                 />
             </div>
             <div>
@@ -170,13 +186,31 @@ export default function MenuPage() {
 
 
 
-                    <div className='flex flex-col space-y-20 items-center justify-center'>
+                    <div className='flex flex-col space-y-10 items-center justify-center'>
                         <div className='flex flex-col justify-center items-center gap-2'>
                             <div className='font-primary leading-9 tracking-widest text-2xl'>DISHES</div>
                             <hr className="w-[500px] h-0.5 border-0 bg-gradient-to-r from-[#CEA07E] to-[#BB5656]"></hr>
                         </div>
-                        <div className='flex grid grid-cols-4 scale-100 gap-4'>
-                            {dishes.map((dish, index) => (
+                        <div className="flex flex-col space-y-4 items-center">
+                            <h2 className="text-2xl text-zinc-700 font-bold tracking-wider">SEARCH</h2>
+                            <div className="flex items-center space-x-3">
+                                <input
+                                    onChange={(e) => setSearch(e.target.value)}
+                                    value={search}
+                                    className="w-[650px] h-[30px] rounded-xl text-zinc-900 text-xl p-1 font-semibold px-2"
+                                    type="text"
+                                    placeholder="Looking for a specific dish?"
+                                />
+                                <div>
+                                    <button onClick={listening ? SpeechRecognition.stopListening: SpeechRecognition.startListening} type="button" 
+                                    className={`${listening? 'bg-red-800 animate-pulse': 'bg-zinc-700'} flex items-center justify-center scale-[1.1] hover:scale-[1.2] h-[35px] w-[35px]  hover:bg-red-800 transition-all rounded-full p-2`}>
+                                        <img src="/mic.png" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='flex flex-1 min-h-[750px] grid grid-cols-4 scale-100 gap-4'>
+                            {dishes.filter(dish => dish.NAME.toLowerCase().includes(search.toLowerCase())).map((dish, index) => (
                                 dish.NAME !== "" ?
                                     (<div key={index}>
                                         <MenuCard
