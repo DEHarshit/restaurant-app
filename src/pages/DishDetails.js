@@ -22,6 +22,7 @@ export default function DishDetails() {
             Add to cart
           </button>
         </div>
+        
       </div>
     );
   }
