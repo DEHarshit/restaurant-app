@@ -44,7 +44,7 @@ export default function IngModal({ isVisible, setModal, dishes }) {
                         <div className="px-10">
                             <div>
                                 <div className='flex p-2 gap-2'>
-                                    <select value={special} onChange={(e)=>setSpecial(e.target.value)} className='p-3 rounded-full p-1 text-primary font-medium bg-zinc-900 hover:bg-zinc-800 transition-all text-white text-xl'>
+                                    <select value={special} onChange={(e)=>setSpecial(e.target.value)} className='p-3 rounded-lg border border-blue-100 p-1 text-primary font-medium bg-zinc-900 hover:bg-zinc-800 transition-all text-white text-xl'>
                                         {Array.isArray(dishes) ? dishes.map((dish, index) => (
                                             <option className="text-primary" key={index}>{dish.NAME}</option>
                                         )) : null}

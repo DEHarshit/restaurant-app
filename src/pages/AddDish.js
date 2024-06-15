@@ -452,9 +452,9 @@ export default function AddDish() {
                                         <div id="ingredient-container" className='flex flex-col'>
                                             {(Array.isArray(dishIngredients)) ? dishIngredients.map((ingredient, index) => (
                                                 <div key={index} className='flex p-2 gap-2'>
-                                                    <select value={dishIngredients[index]} onChange={updateIngredients(index)} id='ing' name='ing' className='text-black rounded-lg p-1 text-primary font-medium'>
+                                                    <select value={dishIngredients[index]} onChange={updateIngredients(index)} id='ing' name='ing' className='text-white bg-zinc-700 rounded-full p-1 text-primary font-medium'>
                                                         {(Array.isArray(ingredients)) ?
-                                                            ingredients.map((opts, i) => <option key={i}>{opts.NAME}</option>) : null
+                                                            ingredients.map((opts, i) => <option className='text-white rounded-3xl font-medium text-primary bg-zinc-700' key={i}>{opts.NAME}</option>) : null
                                                         }
                                                     </select>
                                                     <input value={`${dishQty[index]}`} onChange={updateQuantity(index)} type='number' placeholder='Enter Quantity' className='w-[120px] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none p-1 text-black rounded-lg' />
