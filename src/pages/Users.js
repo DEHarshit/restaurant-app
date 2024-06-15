@@ -129,7 +129,7 @@ export default function Users() {
                 };
                 const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tempusers`, postData);
                 console.log(response)
-                if (response.status == 200){
+                if (response.status == 201){
                     setError('Data Created Successfully')
                     setColor('text-green-600');
                 } else {
