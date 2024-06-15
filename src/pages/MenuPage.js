@@ -17,6 +17,24 @@ export default function MenuPage() {
 
     const [special, setSpecial] = useState(null);
 
+    const [cart, setCart] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedCart = sessionStorage.getItem('Cart');
+            return storedCart ? JSON.parse(storedCart) : [];
+        } else {
+            return [];
+        }
+    });
+
+    const [qty, setQty] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedQty = sessionStorage.getItem('Qty');
+            return storedQty ? JSON.parse(storedQty) : [];
+        } else {
+            return [];
+        }
+    });
+
     async function getRecipes() {
         const postData = {
             method: "GET",
@@ -53,6 +71,15 @@ export default function MenuPage() {
         }
     }, [dishes]);
 
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            sessionStorage.setItem("Cart", JSON.stringify(cart));
+            sessionStorage.setItem("Qty", JSON.stringify(qty));
+        }
+    }, [cart,qty]);
+
+
     if (status === 'loading') {
         return (
             <div>
@@ -67,12 +94,21 @@ export default function MenuPage() {
         router.push('/LogIn')
     }
 
+    function handleCart() {
+        const test = sessionStorage.getItem("Cart")
+        console.log(test);
+    }
 
 
     return (
         <div>
-            <div className="relative z-10">
-                <Header />
+            <div className="fixed sticky z-20 top-0 bg-zinc-900 bg-opacity-30">
+                <Header 
+                cart={cart}
+                setCart={setCart}
+                qty={qty}
+                setQty={setQty}
+                />
             </div>
             <div>
                 <div className='fixed inset-0 animate-pulse'>
@@ -87,6 +123,8 @@ export default function MenuPage() {
                 </div>
                 <div className='relative z-10 flex flex-col items-center'>
 
+
+
                     {special &&
                         <div className='p-10 flex'> {/* Special Now */}
                             <div style={{
@@ -97,7 +135,7 @@ export default function MenuPage() {
 
                             </div>
                             <div className='p-24 gap-3 flex bg-zinc-900 h-[585px] w-[585px] rounded-r-lg'>
-                                <div>
+                                <div className="h-[75px] w-[75px]">
                                     <img src="/special.png" className='translate-y-3 -translate-x-4' />
                                 </div>
                                 <div className='flex flex-col space-y-7'>
@@ -114,14 +152,14 @@ export default function MenuPage() {
                                     </div>
                                     <div className='flex flex-col gap-4'>
                                         <h2 className='text-4xl leading-9 tracking-wide'>{special.NAME ? special.NAME : 'Dish Name'}</h2>
-                                        <span className="text-md text-zinc-500">{recipes?recipes.map((ele)=>ele.INAME) :'Avocados with crab meat, red onion, crab salad stuffed bell pepper...'}</span>
+                                        <span className="text-md text-zinc-500">{recipes ? recipes.map((ele) => (ele.DID === special.ID ? `${ele.INAME}, ` : null)) : 'Avocados with crab meat, red onion, crab salad stuffed bell pepper...'}</span>
                                     </div>
                                     <div className="flex gap-3"> {/* Profile Pic & Name */}
                                         <h2 className="font-primary text-3xl">₹</h2>
                                         <h2 className="font-primary text-3xl">{special.PRICE ? special.PRICE : '00.99'}</h2>
                                     </div>
                                     <div className='translate-y-7'>
-                                        <button className="font-primary font-semibold text-2xl rounded-lg bg-gradient-to-r hover:bg-gradient-to-b from-[#CEA07E] to-[#BB5656] p-2">
+                                        <button onClick={handleCart} className="font-primary font-semibold text-2xl rounded-lg bg-gradient-to-r hover:bg-gradient-to-b from-[#CEA07E] to-[#BB5656] p-2">
                                             Add to Cart
                                         </button>
                                     </div>
@@ -129,6 +167,8 @@ export default function MenuPage() {
                             </div>
                         </div>
                     }
+
+
 
                     <div className='flex flex-col space-y-20 items-center justify-center'>
                         <div className='flex flex-col justify-center items-center gap-2'>
@@ -148,6 +188,10 @@ export default function MenuPage() {
                                             type={dish.TYPE}
                                             isveg={dish.ISVEG}
                                             recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
+                                            cart={cart}
+                                            setCart={setCart}
+                                            qty={qty}
+                                            setQty={setQty}
                                         />
                                     </div>) : null
                             ))}

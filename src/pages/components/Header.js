@@ -1,8 +1,12 @@
 import Link from 'next/link'
 import { signIn, signOut, useSession } from 'next-auth/react';
-export default function Header() {
+import { useState } from 'react';
+import CartModal from './CartModal';
+export default function Header({cart, setCart,qty,setQty}) {
 
     const { data: session, status } = useSession();
+
+    const [modal, setModal] = useState(false)
 
     return (
         <div className="flex items-center justify-between p-5">
@@ -30,7 +34,13 @@ export default function Header() {
 
             </div>
             <div>
-            <div className="flex space-x-3 items-center">
+                <div className="flex space-x-5 items-center">
+                    <div>
+                        <button onClick={(e)=>setModal(true)} className="hover:scale-[1.05] transition-all bg-zinc-400 px-4 flex space-x-3 items-center rounded-full">
+                            <h2 className="font-primary text-black font-semibold">Your Cart</h2>
+                            <img className="h-[35px]" src="/cart.gif" />
+                        </button>
+                    </div>
                     <div className="flex items-center gap-5">
                         <div style={{
                             backgroundImage: `url(/home-image.jpg)`,
@@ -49,12 +59,20 @@ export default function Header() {
                         </div>
                     </div>
 
-                    <button onClick={signOut} type="button" className="scale-[0.9] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
+                    <button onClick={signOut} type="button" className="scale-[0.9] hover:scale-[1] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
                         Sign Out
                     </button>
 
                 </div>
             </div>
+            <CartModal
+                isVisible={modal}
+                setModal={setModal}
+                cart={cart}
+                setCart={setCart}
+                qty={qty}
+                setQty={setQty}
+            />
         </div>
     )
 }
