@@ -1,62 +1,30 @@
 import { useState, useEffect } from 'react'
-import StockModal from './components/StockModal'
 
 export default function Orders() {
 
-    const [mode, setMode] = useState('');
-    const [select, setSelect] = useState([]);
+    const [order, setOrder] = useState([])
+    const [dropDown, setDropDown] = useState(null);
 
-    const [modal, setModal] = useState(false);
-    const [ind, setInd] = useState(0);
-
-    const [stock, setStock] = useState([
-        { ID: 1, NAME: "test1", QTY: "0.3", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-        { ID: 2, NAME: "test2", QTY: "0.1", UOM: "litre", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-        { ID: 3, NAME: "test3", QTY: "0.8", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-    ])
-
-    async function handleSaveChanges() {
-        if (select.length === 0) {
-            handleCancel();
-        } else {
-
-        }
-    }
-
-    function handleCancel() {
-        setSelect([]);
-        setMode('');
-    }
-
-    function handleRemove(key) {
-        if (mode === '') {
-            setMode('remove')
-            setSelect(sel => [...sel, key])
-        }
-        if (mode === 'remove') {
-            if (!select.includes(key)) {
-                setSelect(sel => [...sel, key])
-
-            } else {
-                setSelect(sel => {
-                    return sel.filter(ele => ele !== key)
-                })
+    async function getOrders() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
             }
-            console.log(select)
         }
-
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/orders`, postData);
+        const response = await res.json();
+        setOrder(response.orders)
     }
 
-    function handleEdit(index) {
-        setModal(true)
-        setMode('edit');
-        setInd(index)
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
     }
 
-    function handleAdd() {
-        setModal(true)
-        setMode('add');
-    }
+    useEffect(() => {
+        getOrders()
+    }, [])
 
     return (
         <div className="flex bg-black justify-center w-screen  ">
@@ -67,7 +35,7 @@ export default function Orders() {
                 <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
                     <thead className='border-b border-white'>
                         <tr>
-                            <th className=' py-2 w-[100px]'>
+                            <th className='py-2'>
                                 <div className='flex justify-center'>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
                                         Serial No.
@@ -75,43 +43,31 @@ export default function Orders() {
                                 </div>
                             </th>
                             <th className=''>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Ingredient</span> Name
+                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Order</span>ed By
                             </th>
-                            <th className=' w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Quantity
-                                    </span>
-                                </div>
+                            <th className=''>
+                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Phone</span> Number
                             </th>
                             <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                UO</span>M
+                                STA</span>TUS
                             </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Supplied
-                            </span> Date
+                            <th className=''
+                            ><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    DATE
+                                </span>
                             </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Expiry
-                            </span> Date
-                            </th>
-                            <th className='w-[325px]'>
-                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
-                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
-                                        <span className='text-green-700 text-2xl transition-all'>
-                                            +
-                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                            Add</span> Stock</span>
-                                    </button>
-                                </div>
+                            <th className=''
+                            ><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    ACTI</span>ONS
                             </th>
                         </tr>
                     </thead>
-                    {stock.map((ele, index) => (
+                    {order.map((ele, index) => (
                         <tbody className='border-b border-zinc-700 hover:bg-[#202022] transition-all'>
                             <tr key={index}>
-                                <td className='flex justify-center py-2'>{index + 1}</td>
+                                <td className='flex justify-center py-3'>{index + 1}</td>
                                 <td className=''>
                                     <div className='flex justify-center'>
                                         {ele.NAME}
@@ -119,71 +75,48 @@ export default function Orders() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.QTY}
+                                        {ele.ORDPHONE}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center hover:scale-[1.1] transition-all'>
+                                        <span className={`${ele.STATUS === 'Pending' ? 'text-red-800' : 'text-white'}`}>
+                                            {ele.STATUS}
+                                        </span>
                                     </div>
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.UOM}
+                                        {formatDate(ele.DATE)}
                                     </div>
                                 </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {ele.SUPPLIED_DATE}
+                                <td>
+                                    <div className='flex justify-center space-x-8'>
+                                        <button type="button" className='bg-zinc-800 hover:bg-green-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                            Accept Order
+                                        </button>
+                                        <button type="button" className='bg-zinc-800 hover:bg-red-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                            Cancel Order
+                                        </button>
+                                        <button type="button" onClick={()=>{dropDown == index ? setDropDown(null) : setDropDown(index)}}>
+                                            <div className="  
+                                            border-t-[7px] border-t-transparent
+                                            border-r-[7px] border-r-white hover:border-r-zinc-500
+                                            border-b-[7px] border-b-transparent -rotate-90 transition-all">
+                                            </div>
+                                        </button>
+                                        {dropDown === index && (
+                                            <div className='bg-zinc-800 rounded-xl'>
+                                                Test
+                                            </div>
+                                        )}
                                     </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {ele.EXP_DATE}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    {mode !== 'remove'
-                                        ? <div className='flex justify-center space-x-8'>
-                                            <button onClick={() => handleEdit(index)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-blue-700 text-2xl transition-all'>
-                                                    +
-                                                </span ><span className='text-lg'>Edit</span>
-                                            </button>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
-                                        </div>
-                                        :
-                                        <div className='flex justify-center'>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
-                                        </div>
-                                    }
                                 </td>
                             </tr>
                         </tbody>
                     ))}
                 </table>
             </div>
-            {mode === 'remove' ?
-                <div className='p-3 fixed bottom-0 right-0 '>
-                    <div className='space-x-10 py-7 px-7 bg-zinc-700 rounded-lg bg-opacity-40'>
-                        <button onClick={handleSaveChanges} type="button" className='hover:scale-[1.1] transition-all bg-green-600 text-lg p-1 rounded-full px-2'>
-                            Save Changes
-                        </button>
-                        <button onClick={handleCancel} type="button" className='hover:scale-[1.1] transition-all bg-zinc-600 text-lg p-1 rounded-full px-2'>
-                            Cancel
-                        </button>
-                    </div>
-                </div> : null
-            }
-            <StockModal
-                isVisible={modal}
-                mode={mode}
-                setModal={setModal}
-                setMode={setMode}
-            />
         </div>
     )
 }
