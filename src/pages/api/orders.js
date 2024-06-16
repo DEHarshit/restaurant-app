@@ -7,15 +7,11 @@ export default async function handler(req, res) {
             query: "SELECT * FROM ORDERS",
             values: []
         })
-        res.status(200).json({ orders });
-    } else if (req.method == "PUT") {
-        try {
-            const { cart, qty } = req.body;
-
-        } catch (error) {
-            res.status(500).json({ success: false, error: error.message });
-        }
-
+        const ordetails = await query({
+            query: "SELECT * FROM ORDETAILS",
+            values: []
+        })
+        res.status(200).json({ orders,ordetails });
     } else if (req.method == "POST") {
         try {
             const { name, cart, qty, phone } = req.body;
@@ -44,5 +40,54 @@ export default async function handler(req, res) {
             res.status(500).json({ success: false, error: error.message });
         }
 
-    }
+    } else if (req.method == "DELETE") {
+        try {
+            
+
+            await query({
+                query: "DELETE FROM ORDERS WHERE ID=?",
+                values: [id]
+            })
+
+            const orders = await query({
+                query: "SELECT * FROM ORDERS",
+                values: []
+            })
+
+            res.status(200).json({ orders });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+
+    } else if (req.method == "PUT") {
+        try {
+            const { id,status } = req.body;
+
+            
+            if (status === 'Accepted'){
+                await query({
+                    query: "UPDATE ORDERS SET STATUS = 'Finished' WHERE ID=?",
+                    values: [id]
+                })
+            }
+
+            if (status === 'Pending'){
+                await query({
+                    query: "UPDATE ORDERS SET STATUS = 'Accepted' WHERE ID=?",
+                    values: [id]
+                })
+            }
+
+
+            const orders = await query({
+                query: "SELECT * FROM ORDERS",
+                values: []
+            })
+
+            res.status(200).json({ orders });
+        } catch (error) {
+            res.status(500).json({ success: false, error: error.message });
+        }
+
+    } 
 }
