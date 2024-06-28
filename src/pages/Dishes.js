@@ -1,28 +1,29 @@
-import Link from 'next/link';
-import MenuCard from './components/MenuCard'
-import SpecialModal from './components/SpecialModal'
-import { useState, useEffect } from 'react'
-
+import Link from "next/link";
+import MenuCard from "./components/MenuCard";
+import SpecialModal from "./components/SpecialModal";
+import { useState, useEffect } from "react";
 
 export default function Dishes() {
+  const [dishes, setDishes] = useState([]);
 
-    const [dishes, setDishes] = useState([])
+  const [recipes, setRecipes] = useState([]);
 
-    const [recipes, setRecipes] = useState([]);
+  const [modal, setModal] = useState(false);
 
-    const [modal, setModal] = useState(false);
-
-    async function getRecipes() {
-        const postData = {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json",
-            },
-        };
-        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
-        const response = await res.json();
-        setRecipes(response.recipes);
-    }
+  async function getRecipes() {
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/recipes`,
+      postData
+    );
+    const response = await res.json();
+    setRecipes(response.recipes);
+  }
 
     async function getDishes() {
         const postData = {
@@ -36,12 +37,12 @@ export default function Dishes() {
         setDishes(response.dishes);
     }
 
-    useEffect(() => {
-        getDishes();
-        getRecipes();
-    }, [])
+  useEffect(() => {
+    getDishes();
+    getRecipes();
+  }, []);
 
-    /* bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text */
+  /* bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text */
 
     return (
         <div className="flex bg-black justify-center w-screen ">
