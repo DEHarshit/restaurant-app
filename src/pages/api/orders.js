@@ -43,9 +43,10 @@ export default async function handler(req, res) {
     } else if (req.method == "DELETE") {
         try {
             
+            const { id } = req.body;
 
             await query({
-                query: "DELETE FROM ORDERS WHERE ID=?",
+                query: "UPDATE ORDERS SET STATUS = 'Cancelled' WHERE ID=?",
                 values: [id]
             })
 
