@@ -206,7 +206,8 @@ export default function Users() {
             method: "PUT",
             headers: {
                 "Content-type": "application/json",
-            }
+            },
+            body: JSON.stringify({index:index})
         };
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users`, postData);
         console.log(response)
@@ -221,12 +222,9 @@ export default function Users() {
 
     useEffect(() => {
         getUsers();
-        console.log(users);
     }, []);
 
     useEffect(() => {
-        console.log(index + 1)
-        console.log(users)
         if (index + 1 <= users.length) {
             if (users && users && users[index]) {
                 setId(users[index].id)
@@ -295,7 +293,7 @@ export default function Users() {
                                     </span>
                                 </div>
                                 <div>
-                                    <input value={password} type={`${visible ? 'text' : 'password'}`} className="p-1 border bg-zinc-900 border-2 border-white text-white text-xl h-[45px] w-[250px] rounded-lg" />
+                                    <input readOnly={true} value={password} type={`${visible ? 'text' : 'password'}`} className="p-1 border bg-zinc-900 border-2 border-white text-white text-xl h-[45px] w-[250px] rounded-lg" />
                                     <button type="button" onClick={() => setVisible(!visible)} className="w-[30px] h-[30px] -translate-x-10 translate-y-2">
                                         <img src={`${visible ? '/visible_on.png' : '/visible_off.png'}`} />
                                     </button>

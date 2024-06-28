@@ -105,8 +105,8 @@ export default function Orders() {
                         </tr>
                     </thead>
                     {order.map((ele, index) => (
-                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
-                            <tr key={index} className='hover:scale-[1.01]'  onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }}>
+                        <tbody key={index} className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                            <tr  className='hover:scale-[1.01]'  onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }}>
                                 <td className='flex justify-center py-3'>{index + 1}</td>
                                 <td className=''>
                                     <div className='flex justify-center'>

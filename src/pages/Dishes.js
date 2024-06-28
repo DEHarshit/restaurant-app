@@ -34,7 +34,6 @@ export default function Dishes() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dishes`, postData);
         const response = await res.json();
         setDishes(response.dishes);
-        console.log(dishes)
     }
 
     useEffect(() => {
@@ -80,6 +79,7 @@ export default function Dishes() {
                                 type={dish.TYPE}
                                 isveg={dish.ISVEG}
                                 recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
+                                mode='admin'
                             />
                         </div>
                     ))}

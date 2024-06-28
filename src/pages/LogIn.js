@@ -113,7 +113,7 @@ export default function LogIn() {
 
 
     return (
-        <div className="relative h-screen flex justify-center items-center">
+        <div className="relative h-screen flex justify-center items-center font-primary">
             <div className='fixed inset-0 animate-pulse'>
                 <div>
                     <div>

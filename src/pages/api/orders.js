@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
     if (req.method == "GET") {
         const orders = await query({
-            query: "SELECT * FROM ORDERS",
+            query: "SELECT * FROM ORDERS ORDER BY DATE",
             values: []
         })
         const ordetails = await query({
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         res.status(200).json({ orders,ordetails });
     } else if (req.method == "POST") {
         try {
-            const { name, cart, qty, phone } = req.body;
+            const { name, cart, qty, phone, price } = req.body;
 
             await query({
                 query: "INSERT INTO ORDERS (NAME,ORDPHONE,STATUS,DATE) VALUES (?,?,?,NOW())",
@@ -29,11 +29,23 @@ export default async function handler(req, res) {
 
             for (let i = 0; i < cart.length; i++) {
                 await query({
-                    query: "INSERT INTO ORDETAILS (OID,DNAME,QTY) VALUES (?,?,?)",
-                    values: [id,cart[i],qty[i]]
+                    query: "INSERT INTO ORDETAILS (OID,DNAME,QTY,PRICE) VALUES (?,?,?,?)",
+                    values: [id,cart[i],qty[i],price[i]]
 
                 })
             }
+
+            const rest = await query({
+                query:"SELECT SUM(PRICE) AS PRICE FROM ORDETAILS WHERE OID=?",
+                values: [id]
+            });
+
+            const total = rest[0]?.PRICE;
+
+            await query({
+                query:"UPDATE ORDERS SET PRICE=? WHERE ID=?",
+                values:[total,id]
+            })
 
             res.status(200).json({ success: true });
         } catch (error) {
@@ -43,6 +55,7 @@ export default async function handler(req, res) {
     } else if (req.method == "DELETE") {
         try {
             
+            const { id } = req.body;
 
             await query({
                 query: "DELETE FROM ORDERS WHERE ID=?",
@@ -50,9 +63,11 @@ export default async function handler(req, res) {
             })
 
             const orders = await query({
-                query: "SELECT * FROM ORDERS",
+                query: "SELECT * FROM ORDERS ORDER BY DATE",
                 values: []
             })
+
+
 
             res.status(200).json({ orders });
         } catch (error) {
@@ -80,7 +95,7 @@ export default async function handler(req, res) {
 
 
             const orders = await query({
-                query: "SELECT * FROM ORDERS",
+                query: "SELECT * FROM ORDERS ORDER BY DATE",
                 values: []
             })
 

@@ -38,6 +38,24 @@ export default function DishDetails() {
         }
     });
 
+    const [price, setPrice] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedPrice = sessionStorage.getItem('Price');
+            return storedPrice ? JSON.parse(storedPrice) : [];
+        } else {
+            return [];
+        }
+    });
+
+    const [cPrice, setCPrice] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedPrice = sessionStorage.getItem('CPrice');
+            return storedPrice ? JSON.parse(storedPrice) : [];
+        } else {
+            return [];
+        }
+    });
+
     async function getRecipes() {
         const postData = {
             method: "GET",
@@ -66,11 +84,16 @@ export default function DishDetails() {
         if (!cart.includes(name)) {
             setCart((prevcart) => [...prevcart, name]);
             setQty((prevqty) => [...prevqty, dishQty]);
+            setPrice((prevqty) => [...prevqty, special.PRICE]);
+            setCPrice((prevqty) => [...prevqty, special.PRICE]);
         } else if (cart.includes(name)) {
             const index = cart.indexOf(name);
             const Qty = [...qty]
             Qty[index] = parseInt(Qty[index]) + parseInt(dishQty);
             setQty(Qty)
+            const Price = [...price]
+            Price[index] =  Price[index] + special.PRICE;
+            setPrice(Price)
         }
     }
 

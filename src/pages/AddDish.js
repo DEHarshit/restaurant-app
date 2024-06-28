@@ -11,6 +11,7 @@ export default function AddDish() {
     const [dishTimings, setDishTimings] = useState([]);
     const [dishPrice, setDishPrice] = useState(0);
     const [isVeg, setIsVeg] = useState(false);
+    const [isPre, setIsPre] = useState(false);
     const [dishIngredients, setDishIngredients] = useState([]);
     const [dishQty, setDishQty] = useState([]);
 
@@ -50,6 +51,7 @@ export default function AddDish() {
         setDishTimings([]);
         setDishPrice(0);
         setIsVeg(false);
+        setIsPre(false);
         setDishIngredients([]);
         setDishQty([]);
         setError('');
@@ -123,7 +125,8 @@ export default function AddDish() {
                 price: dishPrice,
                 ing: dishIngredients,
                 qty: dishQty,
-                isveg: isVeg
+                isveg: isVeg,
+                ispre: isPre
             }
             return new Promise(async (resolve, reject) => {
                 if (index == formData.length) {
@@ -167,7 +170,8 @@ export default function AddDish() {
                     price: dishPrice,
                     ing: dishIngredients,
                     qty: dishQty,
-                    isveg: isVeg
+                    isveg: isVeg,
+                    ispre: isPre
                 }
                 return new Promise(async (resolve, reject) => {
                     if (index == formData.length) {
@@ -214,6 +218,7 @@ export default function AddDish() {
                 ing: dishIngredients,
                 qty: dishQty,
                 isveg: isVeg,
+                ispre: isPre,
                 index: index
             }
             return new Promise(async (resolve, reject) => {
@@ -246,7 +251,7 @@ export default function AddDish() {
                 }
             }
         } else if (dishName !== '') {
-            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === ''  || dishQty == '') {
+            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === '' || dishQty == '') {
                 setError('Fill All the Possible Fields')
                 setColor('text-red-800');
             } else {
@@ -258,6 +263,7 @@ export default function AddDish() {
                     ing: dishIngredients,
                     qty: dishQty,
                     isveg: isVeg,
+                    ispre: isPre,
                     index: index
                 }
                 return new Promise(async (resolve, reject) => {
@@ -305,7 +311,7 @@ export default function AddDish() {
             }
             await commitData();
         } else if (dishName !== '') {
-            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === ''  || dishQty == '') {
+            if (image === '' || dishTimings === '' || dishPrice === '' || dishIngredients === '' || dishQty == '') {
                 setError('Fill All the Possible Fields')
                 setColor('text-red-800');
             } else {
@@ -328,6 +334,7 @@ export default function AddDish() {
             headers: {
                 "Content-type": "application/json",
             },
+            body: JSON.stringify({ index: index })
         };
         const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dishes`, postData);
         console.log(response)
@@ -368,6 +375,7 @@ export default function AddDish() {
                 setDishTimings(formData[index].type);
                 setDishPrice(formData[index].price);
                 setIsVeg(formData[index].isveg);
+                setIsPre(formData[index].ispre);
                 setDishIngredients(formData[index].ing)
                 setDishQty(formData[index].qty)
             }
@@ -417,7 +425,7 @@ export default function AddDish() {
                                 <div className="flex items-center justify-center inline-block grid grid-cols-2 bg-zinc-800 p-1 rounded-lg">
                                     <input type="checkbox" id="timings" name="timings" value="M" checked={dishTimings.includes('M')} onChange={handleCheckboxChange} className="h-[20px]" />
                                     <h2 className="-translate-x-3">BREAKFAST</h2>
-                                    <input type="checkbox" id="timings" name="timings" value="L" checked={dishTimings.includes('L')} onChange={handleCheckboxChange} className="h-[20px]" />
+                                    <input type="checkbox" id="timings" name="timings" value="A" checked={dishTimings.includes('A')} onChange={handleCheckboxChange} className="h-[20px]" />
                                     <h2 className="-translate-x-3">LUNCH</h2>
                                     <input type="checkbox" id="timings" name="timings" value="E" checked={dishTimings.includes('E')} onChange={handleCheckboxChange} className="h-[20px]" />
                                     <h2 className="-translate-x-3">SNACK</h2>
@@ -467,9 +475,15 @@ export default function AddDish() {
                             </div>
 
 
-                            <div className="flex items-center justify-center  space-x-3"> {/* IsVeg */}
-                                <h2 className="text-white text-lg font-medium">VEGETARIAN: </h2>
-                                <input type="checkbox" id="isveg" name="isveg" className="h-[20px] w-[20px]" checked={isVeg} onChange={(e) => setIsVeg(!isVeg)} />
+                            <div className='flex items-center justify-center space-x-10'>
+                                <div className="flex items-center justify-center  space-x-3"> {/* IsVeg */}
+                                    <h2 className="text-white text-lg font-medium">VEGETARIAN: </h2>
+                                    <input type="checkbox" id="isveg" name="isveg" className="h-[20px] w-[20px]" checked={isVeg} onChange={(e) => setIsVeg(!isVeg)} />
+                                </div>
+                                <div className="flex items-center justify-center  space-x-3"> {/* IsPre */}
+                                    <h2 className="text-white text-lg font-medium">Pre-Made: </h2>
+                                    <input type="checkbox" id="ispre" name="ispre" className="h-[20px] w-[20px]" checked={isPre} onChange={(e) => setIsPre(!isPre)} />
+                                </div>
                             </div>
 
                         </div>

@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useState } from 'react';
 import CartModal from './CartModal';
-export default function Header({cart, setCart,qty,setQty}) {
+import DigitalClock from './DigitalClock';
+export default function Header({ cart, setCart, qty, setQty, price, setPrice, cPrice, setCPrice, cartId, setCartId, available, preAvailable, setTiming }) {
 
     const { data: session, status } = useSession();
 
@@ -35,8 +36,9 @@ export default function Header({cart, setCart,qty,setQty}) {
             </div>
             <div>
                 <div className="flex space-x-5 items-center">
+                    <DigitalClock setTiming={setTiming} />
                     <div>
-                        <button onClick={(e)=>setModal(true)} className="hover:scale-[1.05] transition-all bg-zinc-400 px-4 flex space-x-3 items-center rounded-full">
+                        <button onClick={(e) => setModal(true)} className="hover:scale-[1.05] transition-all bg-zinc-400 px-4 flex space-x-3 items-center rounded-full">
                             <h2 className="font-primary text-black font-semibold">Your Cart</h2>
                             <img className="h-[35px]" src="/cart.gif" />
                         </button>
@@ -72,6 +74,14 @@ export default function Header({cart, setCart,qty,setQty}) {
                 setCart={setCart}
                 qty={qty}
                 setQty={setQty}
+                price={price}
+                setPrice={setPrice}
+                cPrice={cPrice}
+                setCPrice={setCPrice}
+                cartId={cartId}
+                setCartId={setCartId}
+                available={available}
+                preAvailable={preAvailable}
             />
         </div>
     )

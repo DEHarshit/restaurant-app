@@ -9,18 +9,39 @@ export default function Stock() {
     const [modal, setModal] = useState(false);
     const [ind, setInd] = useState(0);
 
-    const [stock, setStock] = useState([
-        { ID: 1, NAME: "test1", QTY: "0.3", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-        { ID: 2, NAME: "test2", QTY: "0.1", UOM: "litre", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-        { ID: 3, NAME: "test3", QTY: "0.8", UOM: "kg", SUPPLIED_DATE: '2024-05-24', EXP_DATE: '2024-06-07' },
-    ])
+    const [stock, setStock] = useState([])
 
     async function handleSaveChanges() {
         if (select.length === 0) {
             handleCancel();
         } else {
-
+            await revIngredient();
+            setTimeout(() => handleCancel(), 100)
+            async function revIngredient() {
+                const postData = {
+                    method: "DELETE",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify({select})
+                }
+                const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stock`, postData);
+                const response = await res.json();
+                setStock(response.stock)
+            }
         }
+    }
+
+    async function getStock(){
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stock`, postData);
+        const response = await res.json();
+        setStock(response.stock);
     }
 
     function handleCancel() {
@@ -57,6 +78,15 @@ export default function Stock() {
         setModal(true)
         setMode('add');
     }
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: 'long', day: 'numeric'};
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    }
+
+    useEffect(()=>{
+        getStock();
+    },[])
 
     return (
         <div className="flex bg-black justify-center w-screen  ">
@@ -114,7 +144,7 @@ export default function Stock() {
                                 <td className='flex justify-center py-2'>{index + 1}</td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.NAME}
+                                        {ele.INAME}
                                     </div>
                                 </td>
                                 <td className=''>
@@ -124,17 +154,17 @@ export default function Stock() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.UOM}
+                                        g/ml
                                     </div>
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.SUPPLIED_DATE}
+                                    {formatDate(ele.SUPPLIED_DATE)}
                                     </div>
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.EXP_DATE}
+                                    {formatDate(ele.EXP_DATE)}
                                     </div>
                                 </td>
                                 <td className=''>
@@ -183,6 +213,8 @@ export default function Stock() {
                 mode={mode}
                 setModal={setModal}
                 setMode={setMode}
+                setStock={setStock}
+                currStock={stock[ind]}
             />
         </div>
     )

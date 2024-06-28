@@ -8,7 +8,11 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 export default function MenuPage() {
 
+    let copyStock = []
 
+    let offset = 0;
+
+    const [ timing, setTiming] = useState('');
 
     const { data: session, status } = useSession();
 
@@ -29,6 +33,15 @@ export default function MenuPage() {
         }
     });
 
+    const [cartId, setCartId] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedCartId = sessionStorage.getItem('CartId');
+            return storedCartId ? JSON.parse(storedCartId) : [];
+        } else {
+            return [];
+        }
+    });
+
     const [qty, setQty] = useState(() => {
         if (typeof window !== 'undefined') {
             const storedQty = sessionStorage.getItem('Qty');
@@ -38,17 +51,44 @@ export default function MenuPage() {
         }
     });
 
+    const [price, setPrice] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedPrice = sessionStorage.getItem('Price');
+            return storedPrice ? JSON.parse(storedPrice) : [];
+        } else {
+            return [];
+        }
+    });
+
+    const [cPrice, setCPrice] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedPrice = sessionStorage.getItem('CPrice');
+            return storedPrice ? JSON.parse(storedPrice) : [];
+        } else {
+            return [];
+        }
+    });
+
     const {
         transcript,
         listening,
         resetTranscript
-      } = useSpeechRecognition();
+    } = useSpeechRecognition();
 
     const handleSpeechRecognition = () => {
         SpeechRecognition.startListening({ continuous: true });
     };
 
 
+    const [totalStock, setTotalStock] = useState([]);
+    const [tempStock, setTempStock] = useState([]);
+    const [tempDish, setTempDish] = useState([]);
+    const [rcount, setrCount] = useState([]);
+    const [available, setAvaiable] = useState([]);
+    const [acount, setaCount] = useState([]);
+    const [ingredients, setIngredients] = useState([])
+    const [preDish, setPreDish] = useState([]);
+    const [preAvailable, setPreAvailable] = useState([]);
     async function getRecipes() {
         const postData = {
             method: "GET",
@@ -59,6 +99,7 @@ export default function MenuPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
         const response = await res.json();
         setRecipes(response.recipes);
+        setrCount(response.rcount);
     }
 
     async function getDishes() {
@@ -71,10 +112,78 @@ export default function MenuPage() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dishes`, postData);
         const response = await res.json();
         setDishes(response.dishes);
+        setTempDish(response.dishes);
+    }
+
+    function handleCart() {
+        if (!cart.includes(special.NAME)) {
+            setCart((prevcart) => [...prevcart, special.NAME]);
+            setQty((prevqty) => [...prevqty, 1]);
+            setPrice((prevqty) => [...prevqty, special.PRICE]);
+            setCPrice((prevqty) => [...prevqty, special.PRICE]);
+            setCartId((prevqty) => [...prevqty, special.ID])
+        } else if (cart.includes(special.NAME)) {
+            const index = cart.indexOf(special.NAME);
+            const Qty = [...qty]
+            Qty[index] = Qty[index] + 1;
+            setQty(Qty)
+            const Price = [...price]
+            Price[index] = Price[index] + special.PRICE;
+            setPrice(Price)
+        }
+    }
+
+    async function getTotalStock() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dynamic`, postData);
+        const response = await res.json();
+        setTotalStock(response.stock);
+        setTempStock(response.stock)
+        setIngredients(response.ingredients)
+        setPreDish(response.predish)
     }
 
     useEffect(() => {
+        setAvaiable([]);
+        setaCount([]);
+        {
+            rcount.map((ele, index) => {
+                let min = 999;
+                let flag = false; // is available
+                for (let i = 0; i < ele.COUNT; i++) {
+                    let newmin = 0
+                    totalStock.map(stck => {
+                        if (recipes[offset].INAME === stck.INAME) {
+                            if (recipes[offset].QTY > stck.QTY) {
+                                flag = true; // not available
+                            } else {
+                                newmin = Math.floor(stck.QTY / recipes[offset].QTY)
+                                if (newmin < min) {
+                                    min = newmin
+                                }
+                            }
+                        }
+                    });
+                    offset = offset + 1;
+                }
+                if (flag === false) {
+                    setAvaiable((pavailable) => [...pavailable, ele.DID])
+                    setaCount((pavailable) => [...pavailable, min])
+                }
+            })
+        }
+    }, [totalStock, recipes, rcount])
+
+
+    useEffect(() => {
         getDishes();
+        getRecipes();
+        getTotalStock();
         getRecipes();
     }, [])
 
@@ -90,10 +199,77 @@ export default function MenuPage() {
         if (typeof window !== 'undefined') {
             sessionStorage.setItem("Cart", JSON.stringify(cart));
             sessionStorage.setItem("Qty", JSON.stringify(qty));
+            sessionStorage.setItem("Price", JSON.stringify(price));
+            sessionStorage.setItem("CPrice", JSON.stringify(cPrice));
+            sessionStorage.setItem("CartId", JSON.stringify(cartId));
         }
-    }, [cart, qty]);
+    }, [cart, qty, price]);
 
-    useEffect(()=>{transcript ? setSearch(transcript) : ''},[transcript])
+    useEffect(() => {
+        async function dishRecipes(copyStock, ele, index) {
+            const postData = {
+                method: "PUT",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify({ id: ele })
+            };
+            const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
+            const response = await res.json();
+            const recipe = response.recipes;
+
+            if (recipe) {
+                recipe.forEach(ele => {
+                    let ind = ingredients.findIndex(ingredient => ingredient.NAME === ele.INAME);
+                    if (ind !== -1) {
+                        if (copyStock[ind].QTY < (ele.QTY * qty[index])) {
+                            copyStock[ind].QTY = 0;
+                        } else {
+                            copyStock[ind].QTY = copyStock[ind].QTY - (ele.QTY * qty[index]);
+                        }
+                    }
+                });
+            }
+        };
+
+        async function updateStock() {
+            let copyStock = JSON.parse(JSON.stringify(tempStock));
+            let copyDishes = JSON.parse(JSON.stringify(tempDish));
+            let copyPreAvailable = [...preAvailable];
+            if (cartId.length !== 0) {
+                for (const [index, dishId] of cartId.entries()) {
+                    if (!(preDish.findIndex(dish => dish.ID === dishId) !== -1)) {
+                        await dishRecipes(copyStock, dishId, index);
+                    } else {
+                        let ind = copyDishes.findIndex(dish => dish.ID === dishId);
+                        if (ind !== -1) {
+                            if (copyDishes[ind].COUNT - qty[index] <= 0) {
+                                copyDishes[ind].COUNT = 0
+                                copyPreAvailable = copyPreAvailable.filter(id => id !== dishId)
+                            } else {
+                                copyDishes[ind].COUNT = copyDishes[ind].COUNT - qty[index];
+                                if (!copyPreAvailable.includes(dishId)) {
+                                    copyPreAvailable.push(dishId);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            setDishes(copyDishes);
+            setTotalStock(copyStock);
+            setPreAvailable(copyPreAvailable);
+        };
+
+        updateStock();
+
+    }, [qty, tempStock, cartId, ingredients])
+
+    useEffect(() => { transcript ? setSearch(transcript) : '' }, [transcript])
+
+    useEffect(()=>{
+        console.log(timing)
+    },[timing])
 
 
     if (status === 'loading') {
@@ -110,10 +286,6 @@ export default function MenuPage() {
         router.push('/LogIn')
     }
 
-    function handleCart() {
-        const test = sessionStorage.getItem("Cart")
-        console.log(test);
-    }
 
 
     return (
@@ -124,6 +296,15 @@ export default function MenuPage() {
                     setCart={setCart}
                     qty={qty}
                     setQty={setQty}
+                    price={price}
+                    setPrice={setPrice}
+                    cPrice={cPrice}
+                    setCPrice={setCPrice}
+                    cartId={cartId}
+                    setCartId={setCartId}
+                    available={available}
+                    preAvailable={preAvailable}
+                    setTiming={setTiming}
                 />
             </div>
             <div>
@@ -202,8 +383,8 @@ export default function MenuPage() {
                                     placeholder="Looking for a specific dish?"
                                 />
                                 <div>
-                                    <button onClick={listening ? SpeechRecognition.stopListening: SpeechRecognition.startListening} type="button" 
-                                    className={`${listening? 'bg-red-800 animate-pulse': 'bg-zinc-700'} flex items-center justify-center scale-[1.1] hover:scale-[1.2] h-[35px] w-[35px]  hover:bg-red-800 transition-all rounded-full p-2`}>
+                                    <button onClick={listening ? SpeechRecognition.stopListening : SpeechRecognition.startListening} type="button"
+                                        className={`${listening ? 'bg-red-800 animate-pulse' : 'bg-zinc-700'} flex items-center justify-center scale-[1.1] hover:scale-[1.2] h-[35px] w-[35px]  hover:bg-red-800 transition-all rounded-full p-2`}>
                                         <img src="/mic.png" />
                                     </button>
                                 </div>
@@ -211,8 +392,38 @@ export default function MenuPage() {
                         </div>
                         <div className='flex flex-1 min-h-[750px] grid grid-cols-4 scale-100 gap-4'>
                             {dishes.filter(dish => dish.NAME.toLowerCase().includes(search.toLowerCase())).map((dish, index) => (
-                                dish.NAME !== "" ?
-                                    (<div key={index}>
+                                dish.TYPE.includes(timing) 
+                                ? dish.NAME !== ""
+                                ? dish.ISPRE !== 1 ?
+                                    available.includes(dish.ID) ? (
+                                        <div key={index}>
+                                            <MenuCard
+                                                id={dish.ID}
+                                                name={dish.NAME}
+                                                image={dish.IMAGE !== '/placeholder.png' ? dish.IMAGE : '/home-image.jpg'}
+                                                price={dish.PRICE}
+                                                special={dish.SPECIAL}
+                                                type={dish.TYPE}
+                                                isveg={dish.ISVEG}
+                                                recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
+                                                cart={cart}
+                                                setCart={setCart}
+                                                qty={qty}
+                                                setQty={setQty}
+                                                setPrice={setPrice}
+                                                prices={price}
+                                                setCPrice={setCPrice}
+                                                cartId={cartId}
+                                                setCartId={setCartId}
+                                            />
+                                            <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
+                                                <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {acount[index]} </div>
+                                            </div>
+                                        </div>
+                                    ) : null
+
+                                    : dish.COUNT !== 0 ?
+                                    <div key={index}>
                                         <MenuCard
                                             id={dish.ID}
                                             name={dish.NAME}
@@ -226,8 +437,18 @@ export default function MenuPage() {
                                             setCart={setCart}
                                             qty={qty}
                                             setQty={setQty}
+                                            setPrice={setPrice}
+                                            prices={price}
+                                            setCPrice={setCPrice}
+                                            cartId={cartId}
+                                            setCartId={setCartId}
+                                            ispre={dish.ISPRE}
                                         />
-                                    </div>) : null
+                                        <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
+                                            <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {dish.COUNT} </div>
+                                        </div>
+                                    </div> : null
+                                : null :null
                             ))}
                         </div>
                     </div>

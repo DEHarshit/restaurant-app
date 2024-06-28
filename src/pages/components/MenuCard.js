@@ -1,17 +1,23 @@
 import Link from "next/link";
 
-export default function MenuCard({ id, image, isveg, name, price, special, type, recipes, cart, setCart, qty, setQty }) {
-    const ingredients = Array.isArray(recipes) ? recipes.slice(0, 4) : [];
+export default function MenuCard({ id, image, isveg, name, price, special, type, recipes, cart, setCart, qty, setQty, setPrice, prices, setCPrice, cartId, setCartId, mode}) {
+    const ingredients = Array.isArray(recipes) ? recipes.slice(0, 3) : [];
 
     function handleCart() {
         if (!cart.includes(name)) {
             setCart((prevcart) => [...prevcart, name]);
             setQty((prevqty) => [...prevqty, 1]);
+            setPrice((prevqty) => [...prevqty, price]);
+            setCPrice((prevqty) => [...prevqty, price]);
+            setCartId((prevqty) => [...prevqty, id]);
         } else if (cart.includes(name)) {
             const index = cart.indexOf(name);
             const Qty = [...qty]
             Qty[index] = Qty[index] + 1;
             setQty(Qty)
+            const Price = [...prices]
+            Price[index] = Price[index] + price;
+            setPrice(Price)
         }
     }
 
@@ -34,8 +40,8 @@ export default function MenuCard({ id, image, isveg, name, price, special, type,
                         <div> {/* Title */}
                             <h2 className="font-primary text-xl font-semibold leading-5 tracking-wider antialiased transition-all duration-400 hover:text-[#BB5656]">{name ? name : "Dish Name"}</h2>
                             <span className="flex text-[13px] text-zinc-500">
-                                {ingredients.map((ele) => (
-                                    <div>
+                                {ingredients.map((ele, index) => (
+                                    <div key={index}>
                                         {ele.INAME},
                                     </div>
                                 ))}...
@@ -48,9 +54,11 @@ export default function MenuCard({ id, image, isveg, name, price, special, type,
                             <h2 className="font-primary text-lg">{price ? price : "00.00"}</h2>
                         </div>
                         <div>
-                            <button onClick={handleCart} className="font-primary font-semibold text-lg rounded-full bg-gradient-to-r hover:bg-gradient-to-b from-[#CEA07E] to-[#BB5656] duration-400 transition-colors p-2">
-                                Add to Cart
-                            </button>
+                            {mode !== 'admin'
+                                ? <button onClick={handleCart} className="font-primary font-semibold text-lg rounded-full bg-gradient-to-r hover:bg-gradient-to-b from-[#CEA07E] to-[#BB5656] duration-400 transition-colors p-2">
+                                    Add to Cart
+                                </button> : null
+                            }
                         </div>
                     </div>
                 </div>

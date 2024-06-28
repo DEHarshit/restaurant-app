@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     if (req.method == "POST") {
         const jsonData = await fsPromises.readFile(filePath);
         const objectData = JSON.parse(jsonData);
-        const { index,image, name, price, type, ing, qty, isveg } = req.body;
+        const { index,image, name, price, type, ing, qty, isveg,ispre } = req.body;
 
         let imageUrl = image;
         if (image !== '/placeholder.png' && image.indexOf('/dishes/') === -1) {
@@ -37,7 +37,8 @@ export default async function handler(req, res) {
             price,
             ing,
             qty,
-            isveg
+            isveg,
+            ispre
         }
         objectData.push(newData)
 
@@ -52,7 +53,7 @@ export default async function handler(req, res) {
     if (req.method == "PUT") {
         const jsonData = await fsPromises.readFile(filePath);
         const objectData = JSON.parse(jsonData);
-        const { image, name, price, type, ing, qty, isveg, index } = req.body;
+        const { image, name, price, type, ing, qty, isveg, ispre, index } = req.body;
 
         let imageUrl = image;
         if (image !== '/placeholder.png' && image.indexOf('/dishes/') === -1) {
@@ -73,7 +74,8 @@ export default async function handler(req, res) {
             price,
             ing,
             qty,
-            isveg
+            isveg,
+            ispre
         }
         objectData[index] = newData;
 
