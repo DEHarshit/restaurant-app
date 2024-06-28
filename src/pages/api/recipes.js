@@ -16,12 +16,17 @@ export default async function handler(req, res) {
             values: [id || 1]
         })
 
+        const srecipes = await query({
+            query: "SELECT DID,INAME,QTY,UOM FROM RECIPES R,INGREDIENTS I,DISHES D WHERE I.NAME=R.INAME AND D.ID = R.DID AND ISPRE=0 ORDER BY DID",
+            values: [id || 1]
+        })
+
         const rcount = await query({
-            query: "SELECT DID, COUNT(DID) AS COUNT FROM RECIPES GROUP BY DID",
+            query: "SELECT DID, COUNT(DID) AS COUNT FROM RECIPES R,DISHES D WHERE D.ID = R.DID AND ISPRE=0 GROUP BY DID",
             values: []
         })
 
-        res.status(200).json({ recipes, rcount });
+        res.status(200).json({ recipes, rcount,srecipes });
     } if (req.method == "PUT") {
 
         const { id } = req.body;

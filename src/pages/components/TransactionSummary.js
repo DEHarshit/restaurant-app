@@ -7,9 +7,9 @@ const TransactionSummary = ({success,cancel}) => {
   const [ cPercent, setCPercent] = useState(0);
 
   useEffect(()=>{
-    let spercent = (success/total)*100;
+    let spercent = Math.floor((success/total)*100);
     setSPercent(spercent);
-    let cpercent = (cancel/total)*100;
+    let cpercent = Math.floor((cancel/total)*100);
     setCPercent(cpercent);
   },[total])
 

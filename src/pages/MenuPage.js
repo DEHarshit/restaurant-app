@@ -98,7 +98,7 @@ export default function MenuPage() {
         };
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
         const response = await res.json();
-        setRecipes(response.recipes);
+        setRecipes(response.srecipes);
         setrCount(response.rcount);
     }
 
@@ -270,6 +270,10 @@ export default function MenuPage() {
     useEffect(()=>{
         console.log(timing)
     },[timing])
+
+    useEffect(()=>{
+        console.log(preAvailable,available)
+    },[preAvailable,available])
 
 
     if (status === 'loading') {
