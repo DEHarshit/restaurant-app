@@ -94,7 +94,8 @@ export default function Stock() {
 
     function formatDate(dateString) {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString('en-US', options);
+        const date = new Date(dateString).toLocaleDateString('en-US', options);
+        return date === 'January 1, 1970' ? '-' : date;
     }
 
     useEffect(() => {
@@ -173,7 +174,7 @@ export default function Stock() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.QTY}
+                                        {Math.round(ele.QTY * 100) / 100}
                                     </div>
                                 </td>
                                 <td className=''>
@@ -280,7 +281,7 @@ export default function Stock() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.QTY}
+                                        {Math.round(ele.QTY * 100) / 100}
                                     </div>
                                 </td>
                                 <td className=''>
@@ -391,7 +392,7 @@ export default function Stock() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.QTY}
+                                        {Math.round(ele.QTY * 100) / 100}
                                     </div>
                                 </td>
                                 <td className=''>
@@ -503,7 +504,7 @@ export default function Stock() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                        {ele.QTY}
+                                        {Math.round(ele.QTY * 100) / 100}
                                     </div>
                                 </td>
                                 <td className=''>

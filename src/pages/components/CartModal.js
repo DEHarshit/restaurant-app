@@ -1,7 +1,8 @@
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-export default function CartModal({ isVisible, setModal, cart, setCart, qty, setQty, price, setPrice, cPrice, setCPrice, cartId, setCartId, available,preAvailable }) {
+export default function CartModal({ isVisible, setModal, cart, setCart, qty, setQty, price, setPrice, cPrice, setCPrice, cartId, setCartId, available, preAvailable }) {
 
     const { data: session } = useSession();
 
@@ -86,7 +87,7 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
             const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/getphone`, postData);
             const response = await res.json();
             if (res) {
-                setPhone(response[0].PHONE);
+                setPhone(response.phone[0].PHONE);
             }
         }
     }
@@ -157,125 +158,131 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
                             </div>
                         </div>
                         <div className="p-2 flex flex-col space-y-5">
-                            {order.map((ele, index) => (
-                                <div key={index} className='max-w-div bg-black rounded-3xl'>
-                                    <div onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }} className=' bg-zinc-800 hover:translate-y-2 hover:translate-x-2 transition-all duration-400 rounded-3xl'>
-                                        <div className='flex items-center justify-between px-5 h-[100px]'>
-                                            <div className='flex space-x-10'>
-                                                <div className='flex flex-col items-center p-2'>
-                                                    <h2 className='text-lg font-semibold tracking-wide leading-9'>
-                                                        <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
-                                                            Order <span className='text-white'>
-                                                                ID
-                                                            </span>
+                            {order.map((ele, index) => {
+                                if (order.STATUS !== 'Cancelled') {
+                                    return (
+                                        <div key={index} className='max-w-div bg-black rounded-3xl'>
+                                            <div onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }} className=' bg-zinc-800 hover:translate-y-2 hover:translate-x-2 transition-all duration-400 rounded-3xl'>
+                                                <div className='flex items-center justify-between px-5 h-[100px]'>
+                                                    <div className='flex space-x-10'>
+                                                        <div className='flex flex-col items-center p-2'>
+                                                            <h2 className='text-lg font-semibold tracking-wide leading-9'>
+                                                                <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
+                                                                    Order <span className='text-white'>
+                                                                        ID
+                                                                    </span>
+                                                                </div>
+                                                            </h2>
+                                                            <h2>
+                                                                {ele.ID}
+                                                            </h2>
                                                         </div>
-                                                    </h2>
-                                                    <h2>
-                                                        {ele.ID}
-                                                    </h2>
-                                                </div>
-                                                <div className='flex flex-col items-center p-2'>
-                                                    <h2 className='text-lg font-semibold tracking-wide leading-9'>
-                                                        <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
-                                                            Order <span className='text-white'>
-                                                                Status
-                                                            </span>
+                                                        <div className='flex flex-col items-center p-2'>
+                                                            <h2 className='text-lg font-semibold tracking-wide leading-9'>
+                                                                <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
+                                                                    Order <span className='text-white'>
+                                                                        Status
+                                                                    </span>
+                                                                </div>
+                                                            </h2>
+                                                            <h2>
+                                                                <span className={`${ele.STATUS === 'Pending' ? 'text-red-800' : ele.STATUS === 'Finished' ? 'text-blue-800' : 'text-green-800'} cursor-default font-bold`}>
+                                                                    {ele.STATUS.toUpperCase()}
+                                                                </span>
+                                                            </h2>
                                                         </div>
-                                                    </h2>
-                                                    <h2>
-                                                        <span className={`${ele.STATUS === 'Pending' ? 'text-red-800' : ele.STATUS === 'Finished' ? 'text-blue-800' : 'text-green-800'} cursor-default font-bold`}>
-                                                            {ele.STATUS.toUpperCase()}
-                                                        </span>
-                                                    </h2>
-                                                </div>
-                                                <div className='flex flex-col items-center p-2'>
-                                                    <h2 className='text-lg font-semibold tracking-wide leading-9'>
-                                                        <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
-                                                            Payment <span className='text-white'>
-                                                                Status
-                                                            </span>
+                                                        <div className='flex flex-col items-center p-2'>
+                                                            <h2 className='text-lg font-semibold tracking-wide leading-9'>
+                                                                <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
+                                                                    Payment <span className='text-white'>
+                                                                        Status
+                                                                    </span>
+                                                                </div>
+                                                            </h2>
+                                                            <h2>
+                                                                {ele.PSTATUS}
+                                                            </h2>
                                                         </div>
-                                                    </h2>
-                                                    <h2>
-                                                        Not Paid
-                                                    </h2>
-                                                </div>
-                                                <div className='flex flex-col items-center p-2'>
-                                                    <h2 className='text-lg font-semibold tracking-wide leading-9 text-white'>
-                                                        <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
-                                                            Total <span className='text-white'>
-                                                                Cost
-                                                            </span>
+                                                        <div className='flex flex-col items-center p-2'>
+                                                            <h2 className='text-lg font-semibold tracking-wide leading-9 text-white'>
+                                                                <div className="bg-gradient-to-t from-[#CEA07E] to-[#BB5656] text-transparent bg-clip-text">
+                                                                    Total <span className='text-white'>
+                                                                        Cost
+                                                                    </span>
+                                                                </div>
+                                                            </h2>
+                                                            <h2 className='text-lg text-red-600'>
+                                                                {ele.PRICE}
+                                                            </h2>
                                                         </div>
-                                                    </h2>
-                                                    <h2 className='text-lg text-red-600'>
-                                                        {ele.PRICE}
-                                                    </h2>
-                                                </div>
-                                            </div>
-                                            <div className='flex space-x-5 items-center'>
-                                                <button type="button" className='bg-zinc-700 hover:bg-blue-700 p-2 rounded-full px-5 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                    Pay
-                                                </button>
-                                                <button type="button" onClick={() => handleOrdCancel(ele.ID)} className='bg-zinc-700 hover:bg-red-700 p-2 rounded-full px-3 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                    Cancel Order
-                                                </button>
-                                                <button type="button">
-                                                    <div className={`${dropDown == index ? 'rotate-90' : '-rotate-90'}
+                                                    </div>
+                                                    <div className='flex space-x-5 items-center'>
+                                                        <Link href={`/Bill?id=${ele.ID}`}>
+                                                            <button type="button" className='bg-zinc-700 hover:bg-blue-700 p-2 rounded-full px-5 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                                Pay
+                                                            </button>
+                                                        </Link>
+                                                        <button type="button" onClick={() => handleOrdCancel(ele.ID)} className='bg-zinc-700 hover:bg-red-700 p-2 rounded-full px-3 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                            Cancel Order
+                                                        </button>
+                                                        <button type="button">
+                                                            <div className={`${dropDown == index ? 'rotate-90' : '-rotate-90'}
                                                         border-t-[7px] border-t-transparent
                                                         border-r-[7px] border-r-white hover:border-r-zinc-400
                                                         border-b-[7px] border-b-transparent  transition-all duration-300`}>
+                                                            </div>
+                                                        </button>
                                                     </div>
-                                                </button>
+                                                </div>
+                                                {dropDown === index && (
+                                                    <div className=''>
+                                                        <table className="w-full">
+                                                            <thead className='bg-zinc-900 '>
+                                                                <tr className="text-[#C27165] border-b border-zinc-700 text-zinc-400">
+                                                                    <th className="py-1">
+                                                                        DISH
+                                                                    </th>
+                                                                    <th className="">
+                                                                        QUANTITY
+                                                                    </th>
+                                                                    <th className="">
+                                                                        COST
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody className='font-primary text-md text-zinc-400'>
+                                                                {ordetails.map((ord, ind) => {
+                                                                    if (ord.OID === ele.ID)
+                                                                        return (
+                                                                            <tr key={ind} onClick={(e) => handlefinish(ord.OID, ord.DNAME)} className='border-b hover:scale-[1.01] border-zinc-800 bg-zinc-900 hover:text-white hover:bg-zinc-800'>
+                                                                                <td className='py-1'>
+                                                                                    <span className='flex justify-center'>
+                                                                                        {ord.DNAME}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <span className='flex justify-center'>
+                                                                                        {ord.QTY}
+                                                                                    </span>
+                                                                                </td>
+                                                                                <td>
+                                                                                    <span className='flex justify-center'>
+                                                                                        ₹ {ord.PRICE}
+                                                                                    </span>
+                                                                                </td>
+                                                                            </tr>
+                                                                        )
+                                                                })}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                )}
+
                                             </div>
                                         </div>
-                                        {dropDown === index && (
-                                            <div className=''>
-                                                <table className="w-full">
-                                                    <thead className='bg-zinc-900 '>
-                                                        <tr className="text-[#C27165] border-b border-zinc-700 text-zinc-400">
-                                                            <th className="py-1">
-                                                                DISH
-                                                            </th>
-                                                            <th className="">
-                                                                QUANTITY
-                                                            </th>
-                                                            <th className="">
-                                                                COST
-                                                            </th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className='font-primary text-md text-zinc-400'>
-                                                        {ordetails.map((ord, ind) => {
-                                                            if (ord.OID === ele.ID)
-                                                                return (
-                                                                    <tr key={ind} onClick={(e) => handlefinish(ord.OID, ord.DNAME)} className='border-b hover:scale-[1.01] border-zinc-800 bg-zinc-900 hover:text-white hover:bg-zinc-800'>
-                                                                        <td className='py-1'>
-                                                                            <span className='flex justify-center'>
-                                                                                {ord.DNAME}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span className='flex justify-center'>
-                                                                                {ord.QTY}
-                                                                            </span>
-                                                                        </td>
-                                                                        <td>
-                                                                            <span className='flex justify-center'>
-                                                                                ₹ {ord.PRICE}
-                                                                            </span>
-                                                                        </td>
-                                                                    </tr>
-                                                                )
-                                                        })}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
-
-                                    </div>
-                                </div>
-                            ))}
+                                    )
+                                }
+                            })}
 
                         </div>
                     </div>
@@ -315,13 +322,13 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
                                             <td className="py-2 px-4 text-lg ">{price[index]}</td>
                                             <td className="py-2 px-4 space-x-4">
                                                 {
-                                                available.includes(cartId[index]) || preAvailable.includes(cartId[index]) 
-                                                ? <button onClick={() => handleAdd(index)} className="text-2xl text-green-800 hover:text-green-600 hover:scale-[1.1] transition-all mr-2">
-                                                    + <span className='text-2xl text-lg text-white'>ADD</span>
-                                                </button>
-                                                : null
+                                                    available.includes(cartId[index]) || preAvailable.includes(cartId[index])
+                                                        ? <button onClick={() => handleAdd(index)} className="text-2xl text-green-800 hover:text-green-600 hover:scale-[1.1] transition-all mr-2">
+                                                            + <span className='text-2xl text-lg text-white'>ADD</span>
+                                                        </button>
+                                                        : null
                                                 }
-                                                
+
                                                 <button onClick={() => handleReduce(index)} className="text-2xl text-red-800 hover:scale-[1.1] transition-all hover:text-red-600">
                                                     - <span className='text-2xl text-lg text-white'>REMOVE</span>
                                                 </button>

@@ -18,7 +18,7 @@ export default function Dashboard({ timing }) {
   const [expiry, setExpiry] = useState([])
   const [out, setOut] = useState(false)
   let slno = 0
-  const isSaturday = new Date().getDay() === 7 || new Date().getDay() === 6;
+  const isSaturday = new Date().getDay() === 0 || new Date().getDay() === 6;
 
   async function getTotalMenu() {
     const res = await fetch("http://localhost:3000/api/dashboard");
@@ -245,7 +245,7 @@ export default function Dashboard({ timing }) {
                       <li>
                         <div className="flex justify-between">
                           <span>{ele.DNAME}</span>
-                          <span>Rs.470</span>
+                          <span>Rs.{ele.PRICE}</span>
                         </div>
                         <div className="text-gray-400">→ {ele.COUNT} times</div>
                       </li>

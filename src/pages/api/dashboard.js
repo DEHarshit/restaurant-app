@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
     const topdishes = await query({
       query:
-        "SELECT DNAME,COUNT(DNAME) COUNT FROM ORDETAILS GROUP BY DNAME ORDER BY COUNT(*) DESC",
+        "SELECT DNAME,SUM(QTY) COUNT,D.PRICE PRICE FROM ORDETAILS O LEFT JOIN DISHES D ON O.DNAME=D.NAME GROUP BY DNAME ORDER BY COUNT(*) DESC",
       values: [],
     });
 
@@ -28,7 +28,16 @@ export default async function handler(req, res) {
       query: "SELECT STATUS,COUNT(*) COUNT FROM ORDERS GROUP BY STATUS",
       values: [],
     });
+    const revenue = await query({
+      query: "SELECT total_sum revenue FROM BILLS_PAST_7_DAYS",
+      values: []
+    })
 
-    res.status(200).json({ mcount, ocount, topdishes, tsummary, itemsold });
+    const expense = await query({
+      query: "SELECT total_sum revenue FROM SUPPLIES_PAST_7_DAYS",
+      values: []
+    })
+
+    res.status(200).json({ mcount, ocount, topdishes, tsummary, itemsold, revenue, expense });
   }
 }
