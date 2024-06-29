@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     else if (req.method == "DELETE") {
         try {
 
-            const { id } = req.body;
+            const { id,name } = req.body;
 
             await query({
                 query: "DELETE FROM ORDERS WHERE ID=?",
@@ -28,10 +28,9 @@ export default async function handler(req, res) {
             })
 
             const orders = await query({
-                query: "SELECT * FROM ORDERS ORDER BY DATE",
-                values: []
+                query: "SELECT * FROM ORDERS WHERE NAME = ? ORDER BY DATE",
+                values: [name]
             })
-
             const ordetails = await query({
                 query: "SELECT * FROM ORDETAILS",
                 values: []

@@ -9,7 +9,11 @@ export default function Stock() {
     const [modal, setModal] = useState(false);
     const [ind, setInd] = useState(0);
 
-    const [stock, setStock] = useState([])
+    const [stock, setStock] = useState([]);
+    const [mstock, setMstock] = useState([]);
+    const [vstock, setVstock] = useState([]);
+    const [gstock, setGstock] = useState([]);
+    const [cstock, setCstock] = useState([]);
 
     async function handleSaveChanges() {
         if (select.length === 0) {
@@ -23,16 +27,20 @@ export default function Stock() {
                     headers: {
                         "Content-type": "application/json",
                     },
-                    body: JSON.stringify({select})
+                    body: JSON.stringify({ select })
                 }
                 const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stock`, postData);
                 const response = await res.json();
-                setStock(response.stock)
+                setStock(response.stock);
+                setMstock(response.mstock)
+                setVstock(response.vstock)
+                setGstock(response.gstock)
+                setCstock(response.cstock)
             }
         }
     }
 
-    async function getStock(){
+    async function getStock() {
         const postData = {
             method: "GET",
             headers: {
@@ -42,6 +50,10 @@ export default function Stock() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stock`, postData);
         const response = await res.json();
         setStock(response.stock);
+        setMstock(response.mstock)
+        setVstock(response.vstock)
+        setGstock(response.gstock)
+        setCstock(response.cstock)
     }
 
     function handleCancel() {
@@ -71,7 +83,8 @@ export default function Stock() {
     function handleEdit(index) {
         setModal(true)
         setMode('edit');
-        setInd(index)
+        let ind = stock.findIndex(ele => ele.ID === index)
+        setInd(ind)
     }
 
     function handleAdd() {
@@ -80,19 +93,22 @@ export default function Stock() {
     }
 
     function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'long', day: 'numeric'};
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
         return new Date(dateString).toLocaleDateString('en-US', options);
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         getStock();
-    },[])
+    }, [])
 
     return (
-        <div className="flex bg-black justify-center w-screen  ">
-            <div className='flex flex-col items-center p-10 space-y-3'>
+        <div className="flex bg-black items-center py-5 w-screen flex-col">
+            <div className='text-4xl font-semibold tracking-widest leading-8'>
+                <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>STO</span>CK
+            </div>
+            <div className='flex flex-col items-center p-10 space-y-10'>
                 <div className='text-3xl font-semibold tracking-widest leading-8'>
-                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>STO</span>CK
+                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>MEAT </span> STOCK
                 </div>
                 <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
                     <thead className='border-b border-white'>
@@ -104,9 +120,230 @@ export default function Stock() {
                                     </span>
                                 </div>
                             </th>
-                            <th className=''>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Ingredient</span> Name
+                                        Batch No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''>
+                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Ingredient</span> Name
+                            </th>
+                            <th className=' w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Quantity
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                UO</span>M
+                            </th>
+                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                Supplied
+                            </span> Date
+                            </th>
+                            <th className='w-[325px]'>
+                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                        <span className='text-green-700 text-2xl transition-all'>
+                                            +
+                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Add</span> Stock</span>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    {mstock.map((ele, index) => (
+                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                            <tr key={index}>
+                                <td className='flex justify-center py-2'>{index + 1}</td>
+                                <td className=''>
+                                    <div className='flex justify-center text-zinc-600'>
+                                        {ele.SID}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {ele.INAME}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {ele.QTY}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        g/ml
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {formatDate(ele.SUPPLIED_DATE)}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    {mode !== 'remove'
+                                        ? <div className='flex justify-center space-x-8'>
+                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-blue-700 text-2xl transition-all'>
+                                                    +
+                                                </span ><span className='text-lg'>Edit</span>
+                                            </button>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className='flex justify-center'>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    ))}
+                </table>
+                <div className='text-3xl font-semibold tracking-widest leading-8'>
+                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>VEGETABLE </span> STOCK
+                </div>
+                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                    <thead className='border-b border-white'>
+                        <tr>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Serial No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Batch No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''>
+                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Ingredient</span> Name
+                            </th>
+                            <th className=' w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Quantity
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                UO</span>M
+                            </th>
+                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                Supplied
+                            </span> Date
+                            </th>
+                            <th className='w-[325px]'>
+                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                        <span className='text-green-700 text-2xl transition-all'>
+                                            +
+                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Add</span> Stock</span>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    {vstock.map((ele, index) => (
+                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                            <tr key={index}>
+                                <td className='flex justify-center py-2'>{index + 1}</td>
+                                <td className=''>
+                                    <div className='flex justify-center text-zinc-600'>
+                                        {ele.SID}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {ele.INAME}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {ele.QTY}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        g/ml
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {formatDate(ele.SUPPLIED_DATE)}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    {mode !== 'remove'
+                                        ? <div className='flex justify-center space-x-8'>
+                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-blue-700 text-2xl transition-all'>
+                                                    +
+                                                </span ><span className='text-lg'>Edit</span>
+                                            </button>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className='flex justify-center'>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    ))}
+                </table>
+                <div className='text-3xl font-semibold tracking-widest leading-8'>
+                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>GROCERIES </span> STOCK
+                </div>
+                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                    <thead className='border-b border-white'>
+                        <tr>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Serial No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Batch No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''>
+                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Ingredient</span> Name
                             </th>
                             <th className=' w-[100px]'>
                                 <div className='flex justify-center'>
@@ -138,10 +375,15 @@ export default function Stock() {
                             </th>
                         </tr>
                     </thead>
-                    {stock.map((ele, index) => (
-                        <tbody className='border-b border-zinc-700 hover:bg-[#202022] transition-all'>
+                    {gstock.map((ele, index) => (
+                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
                             <tr key={index}>
                                 <td className='flex justify-center py-2'>{index + 1}</td>
+                                <td className=''>
+                                    <div className='flex justify-center text-zinc-600'>
+                                        {ele.SID}
+                                    </div>
+                                </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
                                         {ele.INAME}
@@ -159,18 +401,18 @@ export default function Stock() {
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                    {formatDate(ele.SUPPLIED_DATE)}
+                                        {formatDate(ele.SUPPLIED_DATE)}
                                     </div>
                                 </td>
                                 <td className=''>
                                     <div className='flex justify-center'>
-                                    {formatDate(ele.EXP_DATE)}
+                                        {formatDate(ele.EXP_DATE)}
                                     </div>
                                 </td>
                                 <td className=''>
                                     {mode !== 'remove'
                                         ? <div className='flex justify-center space-x-8'>
-                                            <button onClick={() => handleEdit(index)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
                                                 <span className='text-blue-700 text-2xl transition-all'>
                                                     +
                                                 </span ><span className='text-lg'>Edit</span>
@@ -195,6 +437,115 @@ export default function Stock() {
                         </tbody>
                     ))}
                 </table>
+                <div className='text-3xl font-semibold tracking-widest leading-8'>
+                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>CONDIMENTS </span> STOCK
+                </div>
+                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                    <thead className='border-b border-white'>
+                        <tr>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Serial No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=' py-2 w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Batch No.
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''>
+                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Ingredient</span> Name
+                            </th>
+                            <th className=' w-[100px]'>
+                                <div className='flex justify-center'>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Quantity
+                                    </span>
+                                </div>
+                            </th>
+                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                UO</span>M
+                            </th>
+                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                Supplied
+                            </span> Date
+                            </th>
+                            <th className='w-[325px]'>
+                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                        <span className='text-green-700 text-2xl transition-all'>
+                                            +
+                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Add</span> Stock</span>
+                                    </button>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    {cstock.map((ele, index) => (
+                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                            <tr key={index}>
+                                <td className='flex justify-center py-2'>{index + 1}</td>
+                                <td className=''>
+                                    <div className='flex justify-center text-zinc-600'>
+                                        {ele.SID}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {ele.INAME}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {ele.QTY}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        g/ml
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    <div className='flex justify-center'>
+                                        {formatDate(ele.SUPPLIED_DATE)}
+                                    </div>
+                                </td>
+                                <td className=''>
+                                    {mode !== 'remove'
+                                        ? <div className='flex justify-center space-x-8'>
+                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-blue-700 text-2xl transition-all'>
+                                                    +
+                                                </span ><span className='text-lg'>Edit</span>
+                                            </button>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                        :
+                                        <div className='flex justify-center'>
+                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                <span className='text-red-700 text-2xl transition-all'>
+                                                    -
+                                                </span ><span className='text-lg'>Remove</span>
+                                            </button>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    ))}
+                </table>
+
+
             </div>
             {mode === 'remove' ?
                 <div className='p-3 fixed bottom-0 right-0 '>
@@ -215,6 +566,10 @@ export default function Stock() {
                 setMode={setMode}
                 setStock={setStock}
                 currStock={stock[ind]}
+                setVstock={setVstock}
+                setGstock={setGstock}
+                setMstock={setMstock}
+                setCstock={setCstock}
             />
         </div>
     )

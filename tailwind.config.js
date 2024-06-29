@@ -7,6 +7,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      keyframes: {
+        'pulse-border': {
+          '0%, 100%': { borderColor: '#dc2626' }, // red-500
+          '50%': { borderColor: '#991b1b' }, // red-300
+        },
+      },
+      animation: {
+        'pulse-border': 'pulse-border 2s infinite',
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

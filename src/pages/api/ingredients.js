@@ -7,7 +7,11 @@ export default async function handler(req, res) {
             query: "SELECT * FROM INGREDIENTS ORDER BY NAME                                                                                                                                                                  ",
             values: []
         })
-        res.status(200).json({ ingredients });
+        const groceries = await query({
+            query: "SELECT NAME FROM INGREDIENTS WHERE TYPE='Groceries' ORDER BY NAME                                                                                                                                                                  ",
+            values: []
+        })
+        res.status(200).json({ ingredients, groceries });
     } else if (req.method == "PUT") {
         try {
             const { id, name, type, uom } = req.body;

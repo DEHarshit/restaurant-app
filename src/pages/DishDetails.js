@@ -12,6 +12,7 @@ export default function DishDetails() {
     const { data: session, status } = useSession();
 
     const [dishes, setDishes] = useState([]);
+    const [ timing, setTiming] = useState('');
 
     const [dish, setDish] = useState(null);
     const [ing, setIng] = useState([]);
@@ -116,6 +117,10 @@ export default function DishDetails() {
         }
     }, [cart, qty]);
 
+    useEffect(()=>{
+        console.log(timing)
+    },[timing])
+
 
     if (!dish || ing.length === 0 || status === 'loading') {
         return <div>Loading...</div>;
@@ -133,6 +138,7 @@ export default function DishDetails() {
                     setCart={setCart}
                     qty={qty}
                     setQty={setQty}
+                    setTiming={setTiming}
                 />
             </div>
             <div

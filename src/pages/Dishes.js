@@ -52,7 +52,7 @@ export default function Dishes() {
                     <div className='flex flex-col space-y-3'>
                         <h2 className="px-10 font-semibold text-3xl ">
                             <span className="text-white">
-                                Dishes
+                                All Dishes
                             </span>
                         </h2>
                         <hr className="w-[500px] h-0.5 border-0 bg-gradient-to-r from-[#CEA07E] to-[#BB5656]"></hr>

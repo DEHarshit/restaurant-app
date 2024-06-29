@@ -5,9 +5,22 @@ export default function Orders() {
     const [order, setOrder] = useState([])
     const [ordetails, setOrdetails] = useState([])
     const [dropDown, setDropDown] = useState(null);
+    const [stock, setStock] = useState([]);
 
     function handlefinish(id, name) {
         setOrdetails(Order => Order.map(ord => ord.OID === id && ord.DNAME === name ? { ...ord, FIN: !ord.FIN } : ord))
+    }
+
+    async function getStock() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stock`, postData);
+        const response = await res.json();
+        setStock(response.stock);
     }
 
     async function handleCancel(id) {
@@ -23,18 +36,75 @@ export default function Orders() {
         setOrder(response.orders)
     }
 
-    async function handleAccept(id, status) {
+    async function handleAccept(id, status, index) {
         const postData = {
             method: "PUT",
             headers: {
                 "Content-type": "application/json",
             },
             body: JSON.stringify({ id, status })
-        }
+        };
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/orders`, postData);
         const response = await res.json();
-        setOrder(response.orders)
+        setOrder(response.orders);
+    
+        if (response && status==='Pending') {
+            let copyStock = JSON.parse(JSON.stringify(stock));
+            for (const ele of ordetails) {
+                if (ele.OID === order[index].ID) {
+                    const recipes = await dishRecipes(ele.DNAME);
+                    recipes.forEach(recipe => {
+                        let requiredQty = recipe.QTY;
+                        let index = 0;
+                        while (requiredQty > 0) {
+                            let ind = copyStock.findIndex((ingredient, i) => ingredient.INAME === recipe.INAME && i >= index);
+                            if (ind !== -1) {
+                                if (copyStock[ind].QTY >= requiredQty) {
+                                    copyStock[ind].QTY -= requiredQty;
+                                    requiredQty = 0;
+                                } else {
+                                    requiredQty -= copyStock[ind].QTY;
+                                    copyStock[ind].QTY = 0;
+                                }
+                                index = ind + 1;
+                            } else {
+                                break;
+                            }
+                        }
+                    });
+                }
+            }
+            setStock(copyStock);
+            const updateStock = {
+                method: "PUT",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify({ stock: copyStock })
+            }
+            const updateStockRes = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/updateStock`, updateStock);
+            const updateStockResponse = await updateStockRes.json();
+            console.log(updateStockResponse)
+        }
     }
+
+    async function dishRecipes(dishName) {
+        const postData = {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+            },
+            body: JSON.stringify({ id: dishName }),
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/recipes`, postData);
+        const response = await res.json();
+        return response.recipes;
+    }
+
+    useEffect(() => {
+        console.log(stock)
+    }, [stock])
+
 
     async function getOrders() {
         const postData = {
@@ -55,7 +125,8 @@ export default function Orders() {
     }
 
     useEffect(() => {
-        getOrders()
+        getOrders();
+        getStock();
     }, [])
 
     return (
@@ -106,7 +177,7 @@ export default function Orders() {
                     </thead>
                     {order.map((ele, index) => (
                         <tbody key={index} className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
-                            <tr  className='hover:scale-[1.01]'  onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }}>
+                            <tr className='hover:scale-[1.01]' onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }}>
                                 <td className='flex justify-center py-3'>{index + 1}</td>
                                 <td className=''>
                                     <div className='flex justify-center'>
@@ -135,7 +206,7 @@ export default function Orders() {
                                         {ele.STATUS == 'Pending'
                                             ?
                                             <div className='flex justify-center space-x-8'>
-                                                <button onClick={() => handleAccept(ele.ID, ele.STATUS)} type="button" className='bg-zinc-800 hover:bg-green-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                <button onClick={() => handleAccept(ele.ID, ele.STATUS, index)} type="button" className='bg-zinc-800 hover:bg-green-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
                                                     Accept Order
                                                 </button>
                                                 <button onClick={() => handleCancel(ele.ID)} type="button" className='bg-zinc-800 hover:bg-red-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
@@ -143,13 +214,13 @@ export default function Orders() {
                                                 </button>
                                             </div>
                                             : ele.STATUS == 'Accepted' ?
-                                            <button onClick={() => handleAccept(ele.ID, ele.STATUS)} type="button" className='bg-zinc-800 hover:bg-blue-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                Finish Order
-                                            </button> : null
+                                                <button onClick={() => handleAccept(ele.ID, ele.STATUS)} type="button" className='bg-zinc-800 hover:bg-blue-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    Finish Order
+                                                </button> : null
                                         }
 
                                         <button type="button">
-                                            <div className={` ${dropDown == index ? 'rotate-90':'-rotate-90'}
+                                            <div className={` ${dropDown == index ? 'rotate-90' : '-rotate-90'}
                                         border-t-[7px] border-t-transparent
                                         border-r-[7px] border-r-white hover:border-r-zinc-500
                                         border-b-[7px] border-b-transparent  transition-all duration-300`}>

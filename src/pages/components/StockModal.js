@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Ingredients from "../Ingredients";
 
-export default function IngModal({ isVisible, mode, setModal, setMode, setStock, currStock }) {
+export default function IngModal({ isVisible, mode, setModal, setMode, setStock, currStock, setCstock, setVstock, setGstock, setMstock }) {
     const [id, setId] = useState('')
     const [name, setName] = useState('')
     const [type, setType] = useState('')
@@ -31,12 +31,16 @@ export default function IngModal({ isVisible, mode, setModal, setMode, setStock,
                 headers: {
                     "Content-type": "application/json",
                 },
-                body: JSON.stringify({ id:currStock.ID,ing: selectIngredient, qty: qty, exp: exp })
+                body: JSON.stringify({ id: currStock.ID, ing: selectIngredient, qty: qty, exp: exp })
             };
             const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/stock`, postData);
             if (res.status === 200) {
                 const response = await res.json();
                 setStock(response.stock);
+                setMstock(response.mstock)
+                setVstock(response.vstock)
+                setGstock(response.gstock)
+                setCstock(response.cstock)
                 handleClose();
             }
             else {
@@ -155,6 +159,8 @@ export default function IngModal({ isVisible, mode, setModal, setMode, setStock,
                                     </div>
                                 </span>
 
+                                {currStock.TYPE === 'Groceries'
+                                ?
                                 <span>
                                     <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                         <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
@@ -165,6 +171,8 @@ export default function IngModal({ isVisible, mode, setModal, setMode, setStock,
                                         <input value={exp} onChange={(e) => setExp(e.target.value)} type="date" className=" p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
                                     </div>
                                 </span>
+                                :null
+                                }
                             </div>
                         </div>
                         <div>

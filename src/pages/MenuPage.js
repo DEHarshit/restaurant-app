@@ -272,8 +272,8 @@ export default function MenuPage() {
     },[timing])
 
     useEffect(()=>{
-        console.log(preAvailable,available)
-    },[preAvailable,available])
+        console.log(acount,available)
+    },[acount,available])
 
 
     if (status === 'loading') {
@@ -421,7 +421,7 @@ export default function MenuPage() {
                                                 setCartId={setCartId}
                                             />
                                             <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
-                                                <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {acount[index]} </div>
+                                                <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {acount[available.findIndex(id => id === dish.ID)]} </div>
                                             </div>
                                         </div>
                                     ) : null

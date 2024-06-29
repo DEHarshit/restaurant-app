@@ -97,7 +97,7 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
             headers: {
                 "Content-type": "application/json",
             },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ id, name: session?.user?.name })
         }
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/userorders`, postData);
         const response = await res.json();

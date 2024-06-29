@@ -4,10 +4,26 @@ export default async function handler(req, res) {
 
     if (req.method == "GET") {
         const stock = await query({
-            query: "SELECT * FROM STOCK",
+            query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME ORDER BY INAME",
             values: []
         })
-        res.status(200).json({ stock });
+        const mstock = await query({
+            query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Meat'",
+            values: []
+        })
+        const vstock = await query({
+            query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Vegetables'",
+            values: []
+        })
+        const gstock = await query({
+            query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Groceries'",
+            values: []
+        })
+        const cstock = await query({
+            query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Condiment'",
+            values: []
+        })
+        res.status(200).json({ stock, mstock, vstock, gstock, cstock });
     } else if (req.method == "PUT") {
         try {
             const { id, ing, qty, exp} = req.body;
@@ -22,7 +38,24 @@ export default async function handler(req, res) {
                 values: []
             })
 
-            res.status(200).json({ stock });
+            const mstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Meat'",
+                values: []
+            })
+            const vstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Vegetables'",
+                values: []
+            })
+            const gstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Groceries'",
+                values: []
+            })
+            const cstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Condiment'",
+                values: []
+            })
+
+            res.status(200).json({ stock, mstock, vstock, gstock, cstock });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
         }
@@ -37,11 +70,32 @@ export default async function handler(req, res) {
                 values:[ing,qty,exp]
             })
             
+
+
+
+
             const stock = await query({
                 query: "SELECT * FROM STOCK",
                 values: []
             })
-            res.status(200).json({ stock });
+
+            const mstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Meat'",
+                values: []
+            })
+            const vstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Vegetables'",
+                values: []
+            })
+            const gstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Groceries'",
+                values: []
+            })
+            const cstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Condiment'",
+                values: []
+            })
+            res.status(200).json({ stock, mstock, vstock, gstock, cstock });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
         }
@@ -55,11 +109,31 @@ export default async function handler(req, res) {
                     values: [id]
                 });
             }
+
+
+
             const stock = await query({
                 query: "SELECT * FROM STOCK",
                 values: []
             })
-            res.status(200).json({ stock });
+
+            const mstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Meat'",
+                values: []
+            })
+            const vstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Vegetables'",
+                values: []
+            })
+            const gstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Groceries'",
+                values: []
+            })
+            const cstock = await query({
+                query: "SELECT S.ID,INAME,QTY,UOM,SUPPLIED_DATE,EXP_DATE,TYPE,SID FROM STOCK S LEFT JOIN  INGREDIENTS I ON S.INAME = I.NAME WHERE TYPE='Condiment'",
+                values: []
+            })
+            res.status(200).json({ stock, mstock, vstock, gstock, cstock });
         } catch (error) {
             res.status(500).json({ success:false, error: error.message });
         }

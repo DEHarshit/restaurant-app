@@ -25,7 +25,7 @@ const DigitalClock = ({setTiming}) => {
             newGreeting = 'Night';
         }
         setGreeting(newGreeting);
-        /* setGreeting('Night'); */
+        setGreeting('Night');
     }, [time]);
 
     useEffect(()=>{
@@ -39,7 +39,7 @@ const DigitalClock = ({setTiming}) => {
     return (
         <div className="flex flex-col items-center">
             <div className="text-xl font-bold">
-                <div className='w-[120px]'>
+                <div className='w-[150px]'>
                     {formatTime(time)}
                 </div>
             </div>

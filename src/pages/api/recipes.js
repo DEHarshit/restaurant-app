@@ -37,6 +37,16 @@ export default async function handler(req, res) {
         })
 
         res.status(200).json({ recipes });
+    } if (req.method == "POST") {
+
+        const { id } = req.body;
+
+        const recipes = await query({
+            query: "SELECT DID,INAME,QTY,UOM FROM DISHES D,RECIPES R,INGREDIENTS I WHERE I.NAME=R.INAME AND D.ID=R.DID AND D.NAME=? ORDER BY DID",
+            values: [id]
+        })
+
+        res.status(200).json({ recipes });
     }
 
 }
