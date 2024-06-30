@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 export default function DishDetails() {
     const router = useRouter();
 
-    const { id } = router.query;
+    const { id, count } = router.query;
 
     const { data: session, status } = useSession();
 
@@ -25,6 +25,15 @@ export default function DishDetails() {
         if (typeof window !== 'undefined') {
             const storedCart = sessionStorage.getItem('Cart');
             return storedCart ? JSON.parse(storedCart) : [];
+        } else {
+            return [];
+        }
+    });
+
+    const [cartId, setCartId] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const storedCartId = sessionStorage.getItem('CartId');
+            return storedCartId ? JSON.parse(storedCartId) : [];
         } else {
             return [];
         }
@@ -85,15 +94,16 @@ export default function DishDetails() {
         if (!cart.includes(name)) {
             setCart((prevcart) => [...prevcart, name]);
             setQty((prevqty) => [...prevqty, dishQty]);
-            setPrice((prevqty) => [...prevqty, special.PRICE]);
-            setCPrice((prevqty) => [...prevqty, special.PRICE]);
+            setPrice((prevqty) => [...prevqty, dish.PRICE]);
+            setCPrice((prevqty) => [...prevqty, dish.PRICE]);
+            setCartId((prevqty) => [...prevqty, dish.ID])
         } else if (cart.includes(name)) {
             const index = cart.indexOf(name);
             const Qty = [...qty]
             Qty[index] = parseInt(Qty[index]) + parseInt(dishQty);
             setQty(Qty)
             const Price = [...price]
-            Price[index] =  Price[index] + special.PRICE;
+            Price[index] =  Price[index] + dish.PRICE;
             setPrice(Price)
         }
     }
@@ -114,8 +124,11 @@ export default function DishDetails() {
         if (typeof window !== 'undefined') {
             sessionStorage.setItem("Cart", JSON.stringify(cart));
             sessionStorage.setItem("Qty", JSON.stringify(qty));
+            sessionStorage.setItem("Price", JSON.stringify(price));
+            sessionStorage.setItem("CPrice", JSON.stringify(cPrice));
+            sessionStorage.setItem("CartId", JSON.stringify(cartId));
         }
-    }, [cart, qty]);
+    }, [cart, qty,price]);
 
     useEffect(()=>{
         console.log(timing)
@@ -139,6 +152,7 @@ export default function DishDetails() {
                     qty={qty}
                     setQty={setQty}
                     setTiming={setTiming}
+                    mode={'details'}
                 />
             </div>
             <div
@@ -195,7 +209,7 @@ export default function DishDetails() {
                                     value={dishQty}
                                 />
                                 <div className="flex flex-col">
-                                    <button type="button" onClick={(e)=>setDishQty(dishQty+1)}>
+                                    <button type="button" onClick={(e)=>{dishQty === parseInt(count) ? null : setDishQty(dishQty+1)}}>
                                         <div className="  
                                             border-t-[10px] border-t-transparent
                                             border-r-[10px] border-r-white hover:border-r-green-800

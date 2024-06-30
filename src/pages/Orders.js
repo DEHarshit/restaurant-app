@@ -6,6 +6,7 @@ export default function Orders() {
     const [ordetails, setOrdetails] = useState([])
     const [dropDown, setDropDown] = useState(null);
     const [stock, setStock] = useState([]);
+    const [all, setAll] = useState(false);
 
     function handlefinish(id, name) {
         setOrdetails(Order => Order.map(ord => ord.OID === id && ord.DNAME === name ? { ...ord, FIN: !ord.FIN } : ord))
@@ -47,44 +48,60 @@ export default function Orders() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/orders`, postData);
         const response = await res.json();
         setOrder(response.orders);
-    
-        if (response && status==='Pending') {
+
+        if (response && status === 'Pending') {
             let copyStock = JSON.parse(JSON.stringify(stock));
             for (const ele of ordetails) {
-                if (ele.OID === order[index].ID) {
+                if (ele.OID === id) {
                     const recipes = await dishRecipes(ele.DNAME);
-                    recipes.forEach(recipe => {
-                        let requiredQty = recipe.QTY;
-                        let index = 0;
-                        while (requiredQty > 0) {
-                            let ind = copyStock.findIndex((ingredient, i) => ingredient.INAME === recipe.INAME && i >= index);
-                            if (ind !== -1) {
-                                if (copyStock[ind].QTY >= requiredQty) {
-                                    copyStock[ind].QTY -= requiredQty;
-                                    requiredQty = 0;
+                    if (recipes[0].ISPRE === 0){
+                        recipes.forEach(recipe => {
+                            let requiredQty = recipe.QTY * ele.QTY; // if there is a problem, its due to this
+                            let index = 0;
+                            while (requiredQty > 0) {
+                                let ind = copyStock.findIndex((ingredient, i) => ingredient.INAME === recipe.INAME && i >= index);
+                                if (ind !== -1) {
+                                    if (copyStock[ind].QTY >= requiredQty) {
+                                        copyStock[ind].QTY -= requiredQty;
+                                        requiredQty = 0;
+                                    } else {
+                                        requiredQty -= copyStock[ind].QTY;
+                                        copyStock[ind].QTY = 0;
+                                    }
+                                    index = ind + 1;
                                 } else {
-                                    requiredQty -= copyStock[ind].QTY;
-                                    copyStock[ind].QTY = 0;
+                                    break;
                                 }
-                                index = ind + 1;
-                            } else {
-                                break;
                             }
+                        });
+                    } else {
+                        console.log(recipes)
+                        async function addCount(id, count) {
+                            const postData = {
+                                method: "POST",
+                                headers: {
+                                    "Content-type": "application/json",
+                                },
+                                body: JSON.stringify({ id: id, count: count })
+                            };
+                            const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dynamic`, postData);
+                            const response = await res.json();
+                            console.log(response)
                         }
-                    });
+                        await addCount(recipes[0].DID,ele.QTY)
+                    }
                 }
             }
             setStock(copyStock);
             const updateStock = {
                 method: "PUT",
-                    headers: {
-                        "Content-type": "application/json",
-                    },
-                    body: JSON.stringify({ stock: copyStock })
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify({ stock: copyStock })
             }
             const updateStockRes = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/updateStock`, updateStock);
             const updateStockResponse = await updateStockRes.json();
-            console.log(updateStockResponse)
         }
     }
 
@@ -100,11 +117,6 @@ export default function Orders() {
         const response = await res.json();
         return response.recipes;
     }
-
-    useEffect(() => {
-        console.log(stock)
-    }, [stock])
-
 
     async function getOrders() {
         const postData = {
@@ -129,6 +141,8 @@ export default function Orders() {
         getStock();
     }, [])
 
+    const filteredOrders = all ? order : order.filter(ord => ord.STATUS !== 'Cancelled' && ord.STATUS !== 'Finished');
+
     return (
         <div className="relative flex bg-black justify-center w-screen  ">
             <div className='animate-pulse'>
@@ -140,9 +154,15 @@ export default function Orders() {
                 </div>
             </div>
             <div className='flex flex-col items-center p-10 space-y-3 z-20'>
-                <div className='text-3xl font-semibold tracking-widest leading-8'>
-                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>ORD</span>ERS
-                </div>
+                <span>
+                    <div className='text-3xl font-semibold tracking-widest leading-8'>
+                        <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>ORD</span>ERS
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <h2 className="text-zinc-600 text-lg font-semibold">All Orders: </h2>
+                        <input type="checkbox" id="isveg" name="isveg" className="h-[20px] w-[20px]" checked={all} onChange={(e) => setAll(!all)} />
+                    </div>
+                </span>
                 <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
                     <thead className='border-b border-white'>
                         <tr>
@@ -175,7 +195,7 @@ export default function Orders() {
                             </th>
                         </tr>
                     </thead>
-                    {order.map((ele, index) => (
+                    {filteredOrders.map((ele, index) => (
                         <tbody key={index} className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
                             <tr className='hover:scale-[1.01]' onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }}>
                                 <td className='flex justify-center py-3'>{index + 1}</td>

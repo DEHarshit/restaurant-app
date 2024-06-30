@@ -3,7 +3,7 @@ import { signIn, signOut, useSession } from 'next-auth/react';
 import { useState } from 'react';
 import CartModal from './CartModal';
 import DigitalClock from './DigitalClock';
-export default function Header({ cart, setCart, qty, setQty, price, setPrice, cPrice, setCPrice, cartId, setCartId, available, preAvailable, setTiming }) {
+export default function Header({ cart, setCart, qty, setQty, price, setPrice, cPrice, setCPrice, cartId, setCartId, available, preAvailable, setTiming, mode }) {
 
     const { data: session, status } = useSession();
 
@@ -37,12 +37,16 @@ export default function Header({ cart, setCart, qty, setQty, price, setPrice, cP
             <div>
                 <div className="flex space-x-5 items-center">
                     <DigitalClock setTiming={setTiming} />
-                    <div>
-                        <button onClick={(e) => setModal(true)} className="hover:scale-[1.05] transition-all bg-zinc-400 px-4 flex space-x-3 items-center rounded-full">
-                            <h2 className="font-primary text-black font-semibold">Your Cart</h2>
-                            <img className="h-[35px]" src="/cart.gif" />
-                        </button>
-                    </div>
+                    {mode !== 'details'
+                        ?
+                        <div>
+                            <button onClick={(e) => setModal(true)} className="hover:scale-[1.05] transition-all bg-zinc-400 px-4 flex space-x-3 items-center rounded-full">
+                                <h2 className="font-primary text-black font-semibold">Your Cart</h2>
+                                <img className="h-[35px]" src="/cart.gif" />
+                            </button>
+                        </div>
+                        : null
+                    }
                     <div className="flex items-center gap-5">
                         <div style={{
                             backgroundImage: `url(/home-image.jpg)`,
@@ -61,9 +65,21 @@ export default function Header({ cart, setCart, qty, setQty, price, setPrice, cP
                         </div>
                     </div>
 
-                    <button onClick={signOut} type="button" className="scale-[0.9] hover:scale-[1] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
-                        Sign Out
-                    </button>
+                    <div className='flex flex-col space-y-1 items-center'>
+                        <button onClick={signOut} type="button" className="scale-[0.9] hover:scale-[1] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
+                            Sign Out
+                        </button>
+                        <Link href={`/ChangePass`}>
+                            <h2 className="hover:scale-[1.03] cursor-pointer transition-all px-4 text-sm text-zinc-400 space-x-1">
+                                <div>
+                                    <span>Change </span>
+                                    <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
+                                        Password
+                                    </span>
+                                </div>
+                            </h2>
+                        </Link>
+                    </div>
 
                 </div>
             </div>

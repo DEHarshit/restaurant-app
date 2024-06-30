@@ -159,7 +159,9 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
                         </div>
                         <div className="p-2 flex flex-col space-y-5">
                             {order.map((ele, index) => {
-                                if (order.STATUS !== 'Cancelled') {
+                                if (ele.STATUS === 'Cancelled' || (ele.STATUS === 'Finished' && ele.PSTATUS === 'Paid')) {
+                                    return null
+                                } else {
                                     return (
                                         <div key={index} className='max-w-div bg-black rounded-3xl'>
                                             <div onClick={() => { dropDown == index ? setDropDown(null) : setDropDown(index) }} className=' bg-zinc-800 hover:translate-y-2 hover:translate-x-2 transition-all duration-400 rounded-3xl'>
@@ -217,14 +219,21 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
                                                         </div>
                                                     </div>
                                                     <div className='flex space-x-5 items-center'>
-                                                        <Link href={`/Bill?id=${ele.ID}`}>
-                                                            <button type="button" className='bg-zinc-700 hover:bg-blue-700 p-2 rounded-full px-5 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                                Pay
-                                                            </button>
-                                                        </Link>
+                                                        {ele.STATUS !== 'Pending' && ele.STATUS !== 'Cancelled'
+                                                            ? <Link href={`/Bill?id=${ele.ID}`}>
+                                                                <button type="button" className='bg-zinc-700 hover:bg-blue-700 p-2 rounded-full px-5 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                                    Pay
+                                                                </button>
+                                                            </Link>
+                                                            : null
+                                                        }
+                                                        {ele.STATUS === 'Pending'
+                                                        ?
                                                         <button type="button" onClick={() => handleOrdCancel(ele.ID)} className='bg-zinc-700 hover:bg-red-700 p-2 rounded-full px-3 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
                                                             Cancel Order
                                                         </button>
+                                                        : null
+                                                        }
                                                         <button type="button">
                                                             <div className={`${dropDown == index ? 'rotate-90' : '-rotate-90'}
                                                         border-t-[7px] border-t-transparent

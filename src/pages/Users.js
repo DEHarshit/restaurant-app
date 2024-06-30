@@ -99,42 +99,44 @@ export default function Users() {
             setColor('text-red-800');
         } else {
             const newPass = randomPass();
-            const Data = {
-                id: index + 1,
-                name: name,
-                password: newPass,
-                prevpass: newPass,
-                role: role,
-                email: email,
-                phone: phone
-            }
-            return new Promise(async (resolve, reject) => {
-                if (index == users.length) {
-                    setUsers(oldData => [...oldData, Data]);
-                    try {
-                        await saveData();
-                        resolve();
-                    } catch (error) {
-                        reject(error);
-                    }
+            if(newPass !== ""){
+                const Data = {
+                    id: index + 1,
+                    name: name,
+                    password: newPass,
+                    prevpass: newPass,
+                    role: role,
+                    email: email,
+                    phone: phone
                 }
-            });
-            async function saveData() {
-                const postData = {
-                    method: "POST",
-                    headers: {
-                        "Content-type": "application/json",
-                    },
-                    body: JSON.stringify(Data)
-                };
-                const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tempusers`, postData);
-                console.log(response)
-                if (response.status == 201){
-                    setError('Data Created Successfully')
-                    setColor('text-green-600');
-                } else {
-                    setError('There was an error')
-                    setColor('text-red-800');
+                return new Promise(async (resolve, reject) => {
+                    if (index == users.length) {
+                        setUsers(oldData => [...oldData, Data]);
+                        try {
+                            await saveData();
+                            resolve();
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }
+                });
+                async function saveData() {
+                    const postData = {
+                        method: "POST",
+                        headers: {
+                            "Content-type": "application/json",
+                        },
+                        body: JSON.stringify(Data)
+                    };
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tempusers`, postData);
+                    console.log(response)
+                    if (response.status == 201){
+                        setError('Data Created Successfully')
+                        setColor('text-green-600');
+                    } else {
+                        setError('There was an error')
+                        setColor('text-red-800');
+                    }
                 }
             }
         }
@@ -324,14 +326,16 @@ export default function Users() {
                                 Role
                             </h2>
                             <div className="text-xl font-medium tracking-wider flex items-center justify-center inline-block grid grid-cols-2 bg-zinc-800 p-1 rounded-lg">
-                                <input type="radio" id="timings" name="timings" value="Owner" checked={role == 'Owner'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
-                                <h2 className="-translate-x-3">Owner</h2>
                                 <input type="radio" id="timings" name="timings" value="Admin" checked={role == 'Admin'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
                                 <h2 className="-translate-x-3">Admin</h2>
                                 <input type="radio" id="timings" name="timings" value="Waiter" checked={role == 'Waiter'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
                                 <h2 className="-translate-x-3">Waiter</h2>
-                                <input type="radio" id="timings" name="timings" value="Chef" checked={role == 'Chef'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
-                                <h2 className="-translate-x-3">Chef</h2>
+                                <input type="radio" id="timings" name="timings" value="Kitchen Manager" checked={role == 'Kitchen Manager'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
+                                <h2 className="-translate-x-3">Kitchen Manager</h2>
+                                <input type="radio" id="timings" name="timings" value="Finance Manager" checked={role == 'Finance Manager'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
+                                <h2 className="-translate-x-3">Finance Manager</h2>
+                                <input type="radio" id="timings" name="timings" value="Stores Manager" checked={role == 'Stores Manager'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
+                                <h2 className="-translate-x-3">Stores Manager</h2>
                                 <input type="radio" id="timings" name="timings" value="Customer" checked={role == 'Customer'} onChange={(e) => setRole(e.target.value)} className="h-[20px]" />
                                 <h2 className="-translate-x-3">Customer</h2>
                             </div>

@@ -22,7 +22,24 @@ export default async function handler(req, res) {
         res.status(200).json({ stock, ingredients, predish });
     } else if (req.method == "POST") {
         try {
+            const { id, count } = req.body;
+
+            const acount = await query({
+                query:"SELECT COUNT FROM DISHES WHERE ID = ?",
+                values:[id]
+            })
+
+            await query({
+                query:"UPDATE DISHES SET COUNT = ? WHERE ID = ?",
+                values:[acount[0].COUNT-count,id]
+            })
+
+            const dishes = await query({
+                query: "SELECT D.ID,D.NAME,DESCRIPTION,IMAGE,SPECIAL,PRICE,ISVEG,D.TYPE,ISPRE,COUNT FROM DISHES D",
+                values: []
+            })
             
+            res.status(200).json({ dishes });
 
             res.status(200).json({ success: true });
         } catch (error) {

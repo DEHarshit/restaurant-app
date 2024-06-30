@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react'
+import PreModal from './components/PreModal';
 
 export default function PreMade() {
 
     const [dishes, setDishes] = useState([]);
+    const [modal, setModal] = useState(false);
+
+    const [id,setId] = useState('');
+    const [name, setName] = useState('')
+    const [counts, setCounts] = useState('');
 
     async function getDishes() {
         const postData = {
@@ -17,19 +23,26 @@ export default function PreMade() {
     }
 
     async function addCount(id, count, acount) {
-        if ( acount + count < 0 ){
-            count = -acount 
+        if (acount + count < 0) {
+            count = -acount
         }
         const postData = {
             method: "PUT",
             headers: {
                 "Content-type": "application/json",
             },
-            body: JSON.stringify({ id: id, count: acount+count })
+            body: JSON.stringify({ id: id, count: acount + count })
         };
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dynamic`, postData);
         const response = await res.json();
         setDishes(response.dishes);
+    }
+
+    function handleAdd(ids,names,count){
+        setModal(true);
+        setId(ids);
+        setCounts(count)
+        setName(names)
     }
 
     useEffect(() => {
@@ -52,7 +65,7 @@ export default function PreMade() {
                             <th className=''>
                                 <div className='flex justify-center'>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Available Quantity
+                                        Current Available <span className='text-white'>Quantity</span>
                                     </span>
                                 </div>
                             </th>
@@ -85,18 +98,13 @@ export default function PreMade() {
                                         </td>
                                         <td className=''>
                                             <div className='flex justify-center space-x-10'>
-                                                <button type="button" onClick={()=>addCount(ele.ID,-10,ele.COUNT)} className='hover:bg-red-900 bg-zinc-600 p-1 rounded-xl hover:scale-[1.2] transition-all'>
-                                                    -10
+                                                <button type="button" onClick={()=>handleAdd(ele.ID,ele.NAME,ele.COUNT)} className='hover:bg-green-900 px-3 py-1 bg-zinc-600 rounded-xl hover:scale-[1.2] transition-all'>
+                                                    +ADD
                                                 </button>
-                                                <button type="button" onClick={()=>addCount(ele.ID,-1,ele.COUNT)} className='hover:bg-red-900 px-3 py-1 bg-zinc-600 rounded-xl hover:scale-[1.2] transition-all'>
-                                                    -1
+                                                <button type="button" onClick={() => addCount(ele.ID, -1, ele.COUNT)} className='hover:bg-red-900 px-3 py-1 bg-zinc-600 rounded-xl hover:scale-[1.2] transition-all'>
+                                                    -REMOVE
                                                 </button>
-                                                <button type="button" onClick={()=>addCount(ele.ID,1,ele.COUNT)} className='hover:bg-green-900 px-3 py-1 bg-zinc-600 rounded-xl hover:scale-[1.2] transition-all'>
-                                                    +1
-                                                </button>
-                                                <button type="button" onClick={()=>addCount(ele.ID,10,ele.COUNT)} className='hover:bg-green-900 bg-zinc-600 p-1 rounded-xl hover:scale-[1.2] transition-all'>
-                                                    +10
-                                                </button>
+
                                             </div>
                                         </td>
                                     </tr>
@@ -106,6 +114,16 @@ export default function PreMade() {
                     })}
 
                 </table>
+            </div>
+            <div>
+                <PreModal
+                    isVisible={modal}
+                    setModal={setModal}
+                    id={id}
+                    name={name}
+                    counts={counts}
+                    addCount={addCount}
+                />
             </div>
         </div>
     )

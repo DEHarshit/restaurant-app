@@ -17,6 +17,11 @@ export default function Dashboard({ timing }) {
   const [vegetableIngredients, setVegetableIngredients] = useState([]);
   const [expiry, setExpiry] = useState([])
   const [out, setOut] = useState(false)
+  const [revenue, setRevenue] = useState([]);
+  const [expense, setExpense] = useState([]);
+  const [genbills, setGenBills] = useState(0);
+  const texp = expense[expense.length - 1];
+  const trev = revenue[revenue.length - 1];
   let slno = 0
   const isSaturday = new Date().getDay() === 0 || new Date().getDay() === 6;
 
@@ -28,6 +33,11 @@ export default function Dashboard({ timing }) {
     setTopDishes(response.topdishes.slice(0, 4));
     setTSUM(response.tsummary);
     setItemSold(response.itemsold);
+    setGenBills(response.genbills[0].COUNT)
+    const formattedRevenue = response.revenue.map(item => item.revenue !== null ? parseInt(item.revenue) : 0);
+    setRevenue(formattedRevenue);
+    const formattedExpense = response.expense.map(item => item.revenue !== null ? parseInt(item.revenue) : 0);
+    setExpense(formattedExpense);
   }
 
   async function getReminder() {
@@ -206,11 +216,11 @@ export default function Dashboard({ timing }) {
                 </div>
                 <div className="w-[150px] h-[150px] bg-transparent shadow-md rounded border border-gray-300 flex flex-col items-center justify-between p-4">
                   <div className="flex items-center justify-center flex-grow">
-                    <p className="text-4xl">472</p>
+                    <p className="text-4xl">{genbills}</p>
                   </div>
                   <div>
                     <p className="text-sm bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">
-                      REVENUES
+                      Bills Generated
                     </p>
                   </div>
                 </div>
@@ -253,8 +263,87 @@ export default function Dashboard({ timing }) {
                   </ul>
                 </div>
               </div>
-              <div className="w-[500px] h-[380px] p-10 mb-5 bg-gradient-to-t from-zinc-900 to-stone-800 shadow-md rounded border border-gray-300">
-                <PieChart />
+              <div className="items-center flex flex-col">
+                <div className="w-[500px] h-[380px] p-10 mb-4 bg-gradient-to-t from-zinc-900 to-stone-800 shadow-md rounded border border-gray-300">
+                  <div className='flex flex-col h-full justify-between items-center'>
+                    <div className='flex justify-between w-full'>
+                      <div className='flex flex-col items-center'>
+                        <h2>
+                          Today's Revenues
+                        </h2>
+                        <h2>
+                          {trev}
+                        </h2>
+                      </div>
+                      <div className='flex flex-col items-center'>
+                        <h2>
+                          Today's Expenses
+                        </h2>
+                        <h2>
+                          {texp}
+                        </h2>
+                      </div>
+                    </div>
+                    {trev - texp > 0
+                      ?
+                      <div className='flex flex-col space-y-5 -translate-y-5 items-center'>
+                        <h2>
+                          Today's Profit
+                        </h2>
+                        <div className='flex items-center space-x-5'>
+                          <div>
+                            <div className={` rotate-90
+                                        border-t-[7px] border-t-transparent
+                                        border-r-[7px] border-r-green-600 scale-[1.5]
+                                        border-b-[7px] border-b-transparent  transition-all duration-300`}>
+                            </div>
+                          </div>
+                          <h2 className='text-5xl text-green-600'>
+                            {Math.floor(trev - texp)}
+                          </h2>
+                        </div>
+                      </div>
+                      :
+                      trev - texp === 0
+                        ?
+                        <div className='flex flex-col space-y-5 -translate-y-5 items-center'>
+                          <h2>
+                            Today's Profit/Loss
+                          </h2>
+                          <div className='flex items-center space-x-5'>
+                            <div>
+                              <div className={`text-3xl scale-[1.5]`}>
+                                -
+                              </div>
+                            </div>
+                            <h2 className='text-5xl'>
+                              {Math.floor(trev - texp)}
+                            </h2>
+                          </div>
+                        </div>
+                        :
+                        <div className='flex flex-col space-y-5 -translate-y-5 items-center'>
+                          <h2>
+                            Today's Loss
+                          </h2>
+                          <div className='flex items-center space-x-5'>
+                            <div>
+                              <div className={` -rotate-90
+                                        border-t-[7px] border-t-transparent
+                                        border-r-[7px] border-r-red-600 scale-[1.5]
+                                        border-b-[7px] border-b-transparent  transition-all duration-300`}>
+                              </div>
+                            </div>
+                            <h2 className='text-5xl text-red-600'>
+                              {Math.floor(trev - texp)}
+                            </h2>
+                          </div>
+                        </div>
+                    }
+                    <div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -267,6 +356,7 @@ export default function Dashboard({ timing }) {
                 <TransactionSummary
                   success={tSum[0].COUNT}
                   cancel={tSum[1].COUNT}
+                  totalord={totalOrders[0].COUNT}
                 />
               </div>
             </div>

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     if (req.method == "POST") {
         const {name} = req.body
         const orders = await query({
-            query: "SELECT * FROM ORDERS WHERE NAME = ? ORDER BY DATE",
+            query: "SELECT * FROM ORDERS WHERE NAME = ? ORDER BY DATE DESC",
             values: [name]
         })
         const ordetails = await query({

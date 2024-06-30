@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function MenuCard({ id, image, isveg, name, price, special, type, recipes, cart, setCart, qty, setQty, setPrice, prices, setCPrice, cartId, setCartId, mode}) {
+export default function MenuCard({ id, image, isveg, name, price, special, type, recipes, cart, setCart, qty, setQty, setPrice, prices, setCPrice, cartId, setCartId, mode, available }) {
     const ingredients = Array.isArray(recipes) ? recipes.slice(0, 3) : [];
 
     function handleCart() {
@@ -24,7 +24,7 @@ export default function MenuCard({ id, image, isveg, name, price, special, type,
     return (
         <div className="p-1 bg-gradient-to-t bg-gradient-to-r from-[#CEA07E] to-[#BB5656] h-[456px] w-[356px] rounded-lg">
             <div style={{ height: "448px" }} className="flex flex-col p-6 justify-between rounded-lg bg-zinc-900 w-fit hover:scale-[1] scale-[1.03] transition-all duration-300 space-y-2">
-                <Link href={`/DishDetails?id=${id}`}>
+                <Link href={`/DishDetails?id=${id}&count=${available}`}>
                     <div style={{
                         width: "300px",
                         height: "300px",
@@ -36,7 +36,7 @@ export default function MenuCard({ id, image, isveg, name, price, special, type,
                     </div>
                 </Link>
                 <div className="flex flex-col gap-3">
-                    <Link href="/DishDetails">
+                    <Link href={`/DishDetails?id=${id}&count=${available}`}>
                         <div> {/* Title */}
                             <h2 className="font-primary text-xl font-semibold leading-5 tracking-wider antialiased transition-all duration-400 hover:text-[#BB5656]">{name ? name : "Dish Name"}</h2>
                             <span className="flex text-[13px] text-zinc-500">

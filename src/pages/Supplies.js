@@ -10,6 +10,7 @@ export default function Users() {
     const [stock, setStock] = useState([]);
     const [stockQty, setStockQty] = useState([]);
     const [exp, setExp] = useState([]);
+    const [sup, setSup] = useState('');
 
 
     const [ingredients, setIngredients] = useState([]);
@@ -41,7 +42,7 @@ export default function Users() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tsupply`, postData);
         const response = await res.json();
         setFormData(response);
-        if (response){
+        if (response) {
             setIndex(response.length)
         }
     }
@@ -81,6 +82,7 @@ export default function Users() {
         setStockQty([]);
         setPrice([]);
         setExp([]);
+        setSup('');
     }
 
     function handleSave() {
@@ -90,7 +92,8 @@ export default function Users() {
             price: price,
             stock: stock,
             stockQty: stockQty,
-            exp: exp.map(date => date || null)
+            exp: exp.map(date => date || null),
+            sup : sup
         }
         return new Promise(async (resolve, reject) => {
             if (index == formData.length) {
@@ -129,11 +132,20 @@ export default function Users() {
             price: price,
             stock: stock,
             stockQty: stockQty,
-            exp: exp.map(date => date || null)
+            exp: exp.map(date => date || null),
+            sup: sup
+        }
+        const FData = {
+            id: id,
+            price: price,
+            stock: stock,
+            stockQty: stockQty,
+            exp: exp.map(date => date || null),
+            sup: sup
         }
         return new Promise(async (resolve, reject) => {
             if (index <= formData.length) {
-                setFormData(oldData => [...oldData.slice(0, index), Data, ...oldData.slice(index + 1)]);
+                setFormData(oldData => [...oldData.slice(0, index), FData, ...oldData.slice(index + 1)]);
                 try {
                     await updateData();
                     resolve();
@@ -235,15 +247,7 @@ export default function Users() {
         getIngredients();
         getFormData();
     }, []);
-
-    useEffect(() => {
-        console.log(groceries)
-    }, [groceries])
-
-    useEffect(() => {
-        console.log(stock)
-    }, [stock])
-
+    
     useEffect(() => {
         console.log(index + 1)
         if (index + 1 <= formData.length) {
@@ -253,6 +257,7 @@ export default function Users() {
                 setPrice(formData[index].price);
                 setExp(formData[index].exp);
                 setId(formData[index].id)
+                setSup(formData[index].sup)
             }
         } else {
             clearForm();
@@ -270,7 +275,7 @@ export default function Users() {
                 </div>
                 <div className="flex">
                     <div className="overflow-auto bg-zinc-900 h-[500px] w-[850px] rounded-xl flex flex-col items-center py-12 space-y-10">
-                        <div className='flex flex-col items-center space-y-2'>
+                        <div className='flex flex-col items-center space-y-3'>
                             {index === formData.length
                                 ?
                                 <h2 className='text-green-700 text-md font-medium tracking-wider leading-6'>Add New Supply</h2>
@@ -283,6 +288,15 @@ export default function Users() {
                                 <h2 className="text-xl font-semibold">
                                     {id}
                                 </h2>
+                            </div>
+                            <div className='flex items-center space-x-2'>
+                                <label>SUPPLIED DATE:</label>
+                                <input
+                                    value={sup}
+                                    onChange={(e)=>setSup(e.target.value)}
+                                    type='date'
+                                    className='w-[145px] appearance-textfield appearance-none p-1 text-black rounded-lg'
+                                />
                             </div>
                         </div>
                         <div className="flex items-center space-x-4">

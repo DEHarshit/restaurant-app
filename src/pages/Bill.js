@@ -17,6 +17,9 @@ export default function Bill() {
     const [phone, setPhone] = useState('');
     const [userId, setUserId] = useState('');
 
+    const gst = Math.round(((order.PRICE * 9) / 100) * 100) / 100;
+    const total = Math.round((order.PRICE + gst * 2) * 100) / 100;
+
     async function getOrders() {
         if (id) {
             const postData = {
@@ -40,7 +43,7 @@ export default function Bill() {
                 headers: {
                     "Content-type": "application/json",
                 },
-                body: JSON.stringify({ id: id, user: userId, price: order.PRICE, phone: phone })
+                body: JSON.stringify({ id: id, user: userId, price: total, phone: phone, name:session?.user?.name })
             };
             const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/bill`, postData);
             const response = await res.json();
@@ -60,7 +63,8 @@ export default function Bill() {
             }
             const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/getphone`, postData);
             const response = await res.json();
-            if (res) {
+            console.log(response)
+            if (response) {
                 setPhone(response.phone[0].PHONE);
                 setUserId(response.id[0].ID);
             }
@@ -72,35 +76,35 @@ export default function Bill() {
         const startX = 40;
         let startY = 120;
         const lineSpacing = 20;
-    
+
         const currentDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
+
         html2canvas(input, { scale: 2 })
             .then((canvas) => {
                 const canvasWidth = canvas.width;
                 const canvasHeight = canvas.height;
-    
+
                 const pdf = new jsPDF({
                     orientation: 'p',
                     unit: 'pt',
                     format: 'a4'
                 });
-    
+
                 pdf.setFont('helvetica');
-    
+
                 pdf.setFontSize(16);
                 pdf.text(`Receipt #${order.ID}`, startX, startY - 30);
-    
+
                 pdf.setFontSize(12);
                 pdf.text(`Date: ${currentDate}`, startX, startY);
                 pdf.text(`Time: ${currentTime}`, pdf.internal.pageSize.getWidth() - 150, startY);
                 startY += lineSpacing * 2;
-    
+
                 pdf.setFontSize(12);
                 pdf.text(`Order ID: ${order.ID}`, startX, startY);
                 startY += lineSpacing * 2;
-    
+
                 pdf.setFontSize(12);
                 pdf.setFillColor(207, 207, 207);
                 pdf.rect(startX, startY, pdf.internal.pageSize.getWidth() - 80, lineSpacing, 'F');
@@ -108,7 +112,7 @@ export default function Bill() {
                 pdf.text('Quantity', startX + 250, startY + 15);
                 pdf.text('Cost', startX + 400, startY + 15);
                 startY += lineSpacing;
-    
+
                 pdf.setFontSize(12);
                 ordetails.forEach((item) => {
                     startY += lineSpacing * 2;
@@ -117,47 +121,54 @@ export default function Bill() {
                     pdf.text(item.PRICE.toString(), startX + 400, startY);
                     pdf.line(startX, startY + 10, startX + 500, startY + 10);
                 });
-    
+
+                startY += lineSpacing * 2;
+                pdf.setFontSize(12);
+                pdf.text('Subtotal:', startX + 250, startY);
+                pdf.text(`Rs. ${order.PRICE}`, startX + 400, startY);
+
+                startY += lineSpacing * 2;
+                pdf.setFontSize(12);
+                pdf.text('CGST:', startX + 250, startY);
+                pdf.text(`Rs. ${gst}`, startX + 400, startY);
+
+                startY += lineSpacing * 2;
+                pdf.setFontSize(12);
+                pdf.text('SGST:', startX + 250, startY);
+                pdf.text(`Rs. ${gst}`, startX + 400, startY);
+
                 startY += lineSpacing * 2;
                 pdf.setFontSize(12);
                 pdf.text('Total:', startX + 250, startY);
-                pdf.text(`Rs. ${order.PRICE}`, startX + 400, startY);
-    
+                pdf.line(startX + 350, startY - 20, startX + 500, startY - 20);
+                pdf.text(`Rs. ${total}`, startX + 400, startY);
+                pdf.line(startX + 350, startY + 10, startX + 500, startY + 10);
+
                 const footerText1 = 'SAVE PAPER SAVE NATURE !!';
                 const footerText2 = 'Thank you for choosing us.';
                 const pageWidth = pdf.internal.pageSize.getWidth();
-    
+
                 pdf.setFontSize(10);
                 const textWidth1 = pdf.getTextWidth(footerText1);
                 const textX1 = (pageWidth - textWidth1) / 2;
                 pdf.text(footerText1, textX1, pdf.internal.pageSize.getHeight() - 50);
-    
+
                 pdf.setFontSize(10);
                 const textWidth2 = pdf.getTextWidth(footerText2);
                 const textX2 = (pageWidth - textWidth2) / 2;
                 pdf.text(footerText2, textX2, pdf.internal.pageSize.getHeight() - 30);
-    
+
                 pdf.save(`restaurant_bill_${order.ID}.pdf`);
             });
     }
-    
 
-
-    useEffect(() => {
+    useEffect(()=>{
         getPhone()
-    }, [])
-
-    useEffect(() => {
-        console.log(phone, userId)
-    }, [phone, userId])
+    })
 
     useEffect(() => {
         getOrders()
     }, [id])
-
-    useEffect(() => {
-        console.log(ordetails)
-    }, [ordetails])
 
     if (!id) {
         return (
@@ -225,12 +236,48 @@ export default function Bill() {
                                                 <tr className="bg-zinc-700">
                                                     <td colSpan='2' className="py-4 px-4 ">
                                                         <div className="flex justify-end font-semibold">
-                                                            Total Amount:
+                                                            SUB TOTAL:
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 ">
+                                                        <div className="font-semibold text-xl text-yellow-600">
+                                                            ₹ {order.PRICE}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr className="">
+                                                    <td colSpan='2' className="py-4 px-4 ">
+                                                        <div className="flex justify-end font-semibold">
+                                                            CGST @9%:
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 ">
+                                                        <div className="text-lg">
+                                                            ₹ {gst}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr className="">
+                                                    <td colSpan='2' className="py-4 px-4 ">
+                                                        <div className="flex justify-end font-semibold">
+                                                            SGST @9%:
+                                                        </div>
+                                                    </td>
+                                                    <td className="py-4 px-4 ">
+                                                        <div className="text-lg">
+                                                            ₹ {gst}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr className="">
+                                                    <td colSpan='2' className="py-4 px-4 ">
+                                                        <div className="flex justify-end font-semibold">
+                                                            TOTAL:
                                                         </div>
                                                     </td>
                                                     <td className="py-4 px-4 ">
                                                         <div className="font-semibold text-xl text-green-600">
-                                                            {order.PRICE}
+                                                            ₹ {total}
                                                         </div>
                                                     </td>
                                                 </tr>

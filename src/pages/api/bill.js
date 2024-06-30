@@ -3,16 +3,19 @@ import { query } from "../../lib/db"
 export default async function handler(req, res) {
 
     if (req.method == "GET") {
-        
-        res.status(200).json({ revenue });
+        const bills = await query({
+            query: "SELECT * FROM BILLS",
+            values: []
+        })
+        res.status(200).json({ bills });
     } else if (req.method == "POST") {
         try {
-            const { id, user, phone, price } = req.body;
+            const { id, user, phone, price, name } = req.body;
 
 
             await query({
-                query: "INSERT INTO BILLS (USERID,TOTAL_AMOUNT,OID,PHONE,GEN_DATE) VALUES (?,?,?,?,SYSDATE())",
-                values: [user,price,id,phone]
+                query: "INSERT INTO BILLS (USERID,TOTAL_AMOUNT,OID,PHONE,GEN_DATE,NAME) VALUES (?,?,?,?,NOW(),?)",
+                values: [user,price,id,phone,name]
             })
 
             await query({

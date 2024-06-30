@@ -17,7 +17,7 @@ export default async function handler(req, res) {
             const { name, cart, qty, phone, price } = req.body;
 
             await query({
-                query: "INSERT INTO ORDERS (NAME,ORDPHONE,STATUS,DATE) VALUES (?,?,?,NOW())",
+                query: "INSERT INTO ORDERS (NAME,ORDPHONE,STATUS,DATE,PSTATUS) VALUES (?,?,?,NOW(),'Not Paid')",
                 values: [name, phone, 'Pending']
             })
 

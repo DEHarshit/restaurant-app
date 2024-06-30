@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const TransactionSummary = ({success,cancel}) => {
+const TransactionSummary = ({success,cancel,totalord}) => {
 
   let total = success + cancel;
   const [ sPercent, setSPercent] = useState(0);
@@ -61,9 +61,9 @@ const TransactionSummary = ({success,cancel}) => {
       </div>
       <div className="flex flex-row items-center space-x-5">
         <div className="flex flex-col items-center mr-4">
-          <h2 className="text-lg mb-2  bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">Average</h2>
-          <span className="text-3xl font-semibold">87,456</span>
-          <span className="text-gray-500">Order</span>
+          <h2 className="text-lg mb-2  bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">Total</h2>
+          <span className="text-3xl font-semibold">{totalord}</span>
+          <span className="text-gray-500">Orders</span>
         </div>
       </div>
     </div>

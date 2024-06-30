@@ -38,6 +38,11 @@ export default async function handler(req, res) {
       values: []
     })
 
-    res.status(200).json({ mcount, ocount, topdishes, tsummary, itemsold, revenue, expense });
+    const genbills = await query({
+      query: "SELECT COUNT(*) COUNT FROM BILLS",
+      values: []
+    })
+
+    res.status(200).json({ mcount, ocount, topdishes, tsummary, itemsold, revenue, expense, genbills});
   }
 }

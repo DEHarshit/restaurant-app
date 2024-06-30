@@ -17,14 +17,15 @@ export default async function handler(req, res) {
     if (req.method == "POST") {
         const jsonData = await fsPromises.readFile(filePath);
         const objectData = JSON.parse(jsonData);
-        const { index, price, stock, stockQty, exp } = req.body;
+        const { index, price, stock, stockQty, exp, sup } = req.body;
 
         const newData = {
             id: index + 1,
             price,
             stock,
             stockQty,
-            exp
+            exp,
+            sup
         }
         objectData.push(newData)
 
@@ -39,14 +40,15 @@ export default async function handler(req, res) {
     if (req.method == "PUT") {
         const jsonData = await fsPromises.readFile(filePath);
         const objectData = JSON.parse(jsonData);
-        const { index, price, stock, stockQty, exp } = req.body;
+        const { index, price, stock, stockQty, exp, sup } = req.body;
 
         const newData = {
             id: index + 1,
             price,
             stock,
             stockQty,
-            exp
+            exp,
+            sup
         }
         objectData[index] = newData;
 
@@ -73,8 +75,8 @@ export default async function handler(req, res) {
             const totalPrice = prices.reduce((total, price) => total + price, 0);
 
             await query({
-                query: "INSERT INTO SUPPLIES (ID,SUPPLIED_DATE,PRICE) VALUES (?,SYSDATE(),?) ON DUPLICATE KEY UPDATE SUPPLIED_DATE=VALUES(SUPPLIED_DATE), PRICE=VALUES(PRICE) ",
-                values: [supply.id, totalPrice]
+                query: "INSERT INTO SUPPLIES (ID,SUPPLIED_DATE,PRICE) VALUES (?,?,?) ON DUPLICATE KEY UPDATE SUPPLIED_DATE=VALUES(SUPPLIED_DATE), PRICE=VALUES(PRICE) ",
+                values: [supply.id, supply.sup, totalPrice]
             });
 
             if (Array.isArray(supply.stock) && Array.isArray(supply.stockQty) && supply.stock.length === supply.stockQty.length) {
@@ -88,8 +90,8 @@ export default async function handler(req, res) {
                     const qty = supply.stockQty[i];
                     const exp = supply.exp[i]
                     await query({
-                        query: "INSERT INTO STOCK (INAME,QTY,SUPPLIED_DATE,EXP_DATE,SID) VALUES (?,?,SYSDATE(),?,?)",
-                        values: [ing, qty, exp, supply.id]
+                        query: "INSERT INTO STOCK (INAME,QTY,SUPPLIED_DATE,EXP_DATE,SID) VALUES (?,?,?,?,?)",
+                        values: [ing, qty,supply.sup, exp, supply.id]
                     });
                 }
             } else {

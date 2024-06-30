@@ -12,7 +12,11 @@ export default function MenuPage() {
 
     let offset = 0;
 
-    const [ timing, setTiming] = useState('');
+    const [timing, setTiming] = useState('');
+
+    const [veg, setVeg] = useState(false);
+
+    const [pre, setPre] = useState(0);
 
     const { data: session, status } = useSession();
 
@@ -89,6 +93,28 @@ export default function MenuPage() {
     const [ingredients, setIngredients] = useState([])
     const [preDish, setPreDish] = useState([]);
     const [preAvailable, setPreAvailable] = useState([]);
+
+    const filteredMenu = dishes.filter((dish) => {
+        if (veg && dish.ISVEG !== 1) {
+            return false;
+        }
+        if (pre === 1 && dish.ISPRE === 1) {
+            return false;
+        }
+        if (pre === 2 && dish.ISPRE !== 1) {
+            return false;
+        }
+        return true;
+    });
+
+    function handlePreChange() {
+        if (pre !== 2) {
+            setPre(pre + 1)
+        } else {
+            setPre(0)
+        }
+    }
+
     async function getRecipes() {
         const postData = {
             method: "GET",
@@ -267,13 +293,13 @@ export default function MenuPage() {
 
     useEffect(() => { transcript ? setSearch(transcript) : '' }, [transcript])
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(timing)
-    },[timing])
+    }, [timing])
 
-    useEffect(()=>{
-        console.log(acount,available)
-    },[acount,available])
+    useEffect(() => {
+        console.log(acount, available)
+    }, [acount, available])
 
 
     if (status === 'loading') {
@@ -309,6 +335,7 @@ export default function MenuPage() {
                     available={available}
                     preAvailable={preAvailable}
                     setTiming={setTiming}
+                    mode={''}
                 />
             </div>
             <div>
@@ -379,6 +406,21 @@ export default function MenuPage() {
                         <div className="flex flex-col space-y-4 items-center">
                             <h2 className="text-2xl text-zinc-700 font-bold tracking-wider">SEARCH</h2>
                             <div className="flex items-center space-x-3">
+                                <div className='w-[75px] flex flex-col space-y-2 items-center'>
+                                    <div className='text-sm text-zinc-600'>
+                                        {pre === 0 ? 'All Dishes' : pre === 1 ? 'Fresh' : pre === 2 ? 'Pre-cooked' : ''}
+                                    </div>
+                                    <div onClick={handlePreChange} className='cursor-pointer bg-white h-[20px] w-[60px] rounded-full'>
+                                        <div className={`transition-all ${pre === 0 ? '' : pre === 1 ? 'translate-x-[20px]' : pre === 2 ? 'translate-x-[40px]' : ''}`}>
+                                            <div className='h-[20px] w-[20px] rounded-full bg-blue-800'>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <h2 className="text-zinc-600 text-lg font-semibold">Veg: </h2>
+                                    <input type="checkbox" id="isveg" name="isveg" className="h-[20px] w-[20px]" checked={veg} onChange={(e) => setVeg(!veg)} />
+                                </div>
                                 <input
                                     onChange={(e) => setSearch(e.target.value)}
                                     value={search}
@@ -395,64 +437,66 @@ export default function MenuPage() {
                             </div>
                         </div>
                         <div className='flex flex-1 min-h-[750px] grid grid-cols-4 scale-100 gap-4'>
-                            {dishes.filter(dish => dish.NAME.toLowerCase().includes(search.toLowerCase())).map((dish, index) => (
-                                dish.TYPE.includes(timing) 
-                                ? dish.NAME !== ""
-                                ? dish.ISPRE !== 1 ?
-                                    available.includes(dish.ID) ? (
-                                        <div key={index}>
-                                            <MenuCard
-                                                id={dish.ID}
-                                                name={dish.NAME}
-                                                image={dish.IMAGE !== '/placeholder.png' ? dish.IMAGE : '/home-image.jpg'}
-                                                price={dish.PRICE}
-                                                special={dish.SPECIAL}
-                                                type={dish.TYPE}
-                                                isveg={dish.ISVEG}
-                                                recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
-                                                cart={cart}
-                                                setCart={setCart}
-                                                qty={qty}
-                                                setQty={setQty}
-                                                setPrice={setPrice}
-                                                prices={price}
-                                                setCPrice={setCPrice}
-                                                cartId={cartId}
-                                                setCartId={setCartId}
-                                            />
-                                            <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
-                                                <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {acount[available.findIndex(id => id === dish.ID)]} </div>
-                                            </div>
-                                        </div>
-                                    ) : null
+                            {filteredMenu.filter(dish => dish.NAME.toLowerCase().includes(search.toLowerCase())).map((dish, index) => (
+                                dish.TYPE.includes(timing)
+                                    ? dish.NAME !== ""
+                                        ? dish.ISPRE !== 1 ?
+                                            available.includes(dish.ID) ? (
+                                                <div key={index}>
+                                                    <MenuCard
+                                                        id={dish.ID}
+                                                        name={dish.NAME}
+                                                        image={dish.IMAGE !== '/placeholder.png' ? dish.IMAGE : '/home-image.jpg'}
+                                                        price={dish.PRICE}
+                                                        special={dish.SPECIAL}
+                                                        type={dish.TYPE}
+                                                        isveg={dish.ISVEG}
+                                                        recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
+                                                        cart={cart}
+                                                        setCart={setCart}
+                                                        qty={qty}
+                                                        setQty={setQty}
+                                                        setPrice={setPrice}
+                                                        prices={price}
+                                                        setCPrice={setCPrice}
+                                                        cartId={cartId}
+                                                        setCartId={setCartId}
+                                                        available={acount[available.findIndex(id => id === dish.ID)]}
+                                                    />
+                                                    <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
+                                                        <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {acount[available.findIndex(id => id === dish.ID)]} </div>
+                                                    </div>
+                                                </div>
+                                            ) : null
 
-                                    : dish.COUNT !== 0 ?
-                                    <div key={index}>
-                                        <MenuCard
-                                            id={dish.ID}
-                                            name={dish.NAME}
-                                            image={dish.IMAGE !== '/placeholder.png' ? dish.IMAGE : '/home-image.jpg'}
-                                            price={dish.PRICE}
-                                            special={dish.SPECIAL}
-                                            type={dish.TYPE}
-                                            isveg={dish.ISVEG}
-                                            recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
-                                            cart={cart}
-                                            setCart={setCart}
-                                            qty={qty}
-                                            setQty={setQty}
-                                            setPrice={setPrice}
-                                            prices={price}
-                                            setCPrice={setCPrice}
-                                            cartId={cartId}
-                                            setCartId={setCartId}
-                                            ispre={dish.ISPRE}
-                                        />
-                                        <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
-                                            <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {dish.COUNT} </div>
-                                        </div>
-                                    </div> : null
-                                : null :null
+                                            : dish.COUNT !== 0 ?
+                                                <div key={index}>
+                                                    <MenuCard
+                                                        id={dish.ID}
+                                                        name={dish.NAME}
+                                                        image={dish.IMAGE !== '/placeholder.png' ? dish.IMAGE : '/home-image.jpg'}
+                                                        price={dish.PRICE}
+                                                        special={dish.SPECIAL}
+                                                        type={dish.TYPE}
+                                                        isveg={dish.ISVEG}
+                                                        recipes={recipes.filter(recipe => recipe.DID === dish.ID)}
+                                                        cart={cart}
+                                                        setCart={setCart}
+                                                        qty={qty}
+                                                        setQty={setQty}
+                                                        setPrice={setPrice}
+                                                        prices={price}
+                                                        setCPrice={setCPrice}
+                                                        cartId={cartId}
+                                                        setCartId={setCartId}
+                                                        ispre={dish.ISPRE}
+                                                        available={dish.COUNT}
+                                                    />
+                                                    <div className='flex justify-end -translate-y-[425px] text-xl -translate-x-[10px] scale-[0.9]'>
+                                                        <div className='bg-zinc-800 py-2 px-4 inline-block rounded-2xl'>Availability: {dish.COUNT} </div>
+                                                    </div>
+                                                </div> : null
+                                        : null : null
                             ))}
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react"
 import { signIn } from 'next-auth/react';
+import Link from "next/link";
 
 export default function LogIn() {
 
@@ -45,7 +46,7 @@ export default function LogIn() {
     async function handleSignUp(e) {
         e.preventDefault();
         const user = users.find(e => e.NAME === name);
-        if ( name === '' || password === '' || email === '' || phone === ''){
+        if (name === '' || password === '' || email === '' || phone === '') {
             setError("Fill every field");
         } else {
             if (!user) {
@@ -165,12 +166,16 @@ export default function LogIn() {
                                                 <img src={`${visible ? '/visible_on.png' : '/visible_off.png'}`} />
                                             </button>
                                         </span>
-                                        <h2 className="px-4 text-sm text-zinc-400 space-x-1">
-                                            <span>Forget</span>
-                                            <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
-                                                Password?
-                                            </span>
-                                        </h2>
+                                        <Link href={`/ForgetPass`}>
+                                            <h2 className="hover:scale-[1.03] cursor-pointer transition-all px-4 text-sm text-zinc-400 space-x-1">
+                                                <div>
+                                                    <span>Forget </span>
+                                                    <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
+                                                        Password?
+                                                    </span>
+                                                </div>
+                                            </h2>
+                                        </Link>
                                     </span>
                                 </div>
                                 <div className="flex flex-col space-y-2 justify-center items-center">

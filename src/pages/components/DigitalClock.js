@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const DigitalClock = ({setTiming}) => {
+const DigitalClock = ({ setTiming }) => {
     const [time, setTime] = useState(new Date());
     const [greeting, setGreeting] = useState('');
 
@@ -25,12 +25,12 @@ const DigitalClock = ({setTiming}) => {
             newGreeting = 'Night';
         }
         setGreeting(newGreeting);
-        setGreeting('Night');
+        /* setGreeting('Afternoon'); */
     }, [time]);
 
-    useEffect(()=>{
-        setTiming(greeting.slice(0,1));
-    },[greeting])
+    useEffect(() => {
+        setTiming(greeting.slice(0, 1));
+    }, [greeting])
 
     const formatTime = (time) => {
         return time.toLocaleTimeString('en-US', { hour12: true });
