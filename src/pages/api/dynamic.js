@@ -9,6 +9,11 @@ export default async function handler(req, res) {
             values:[]
         })
 
+        const ustock = await query({
+            query:"SELECT T.INAME INAME,T.QTY QTY,I.UOM FROM TOTAL_STOCK T LEFT JOIN INGREDIENTS I ON I.NAME=T.INAME",
+            values:[]
+        })
+
         const ingredients = await query({
             query:"SELECT NAME FROM INGREDIENTS",
             values:[]
@@ -19,7 +24,7 @@ export default async function handler(req, res) {
             values:[]
         })
 
-        res.status(200).json({ stock, ingredients, predish });
+        res.status(200).json({ stock, ingredients, predish,ustock });
     } else if (req.method == "POST") {
         try {
             const { id, count } = req.body;

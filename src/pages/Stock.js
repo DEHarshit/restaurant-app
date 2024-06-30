@@ -15,6 +15,22 @@ export default function Stock() {
     const [gstock, setGstock] = useState([]);
     const [cstock, setCstock] = useState([]);
 
+
+    const [view, setView] = useState(false);
+    const [totalStock, setTotalStock] = useState([]);
+
+    async function getTotalStock() {
+        const postData = {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json",
+            },
+        };
+        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dynamic`, postData);
+        const response = await res.json();
+        setTotalStock(response.ustock);
+    }
+
     async function handleSaveChanges() {
         if (select.length === 0) {
             handleCancel();
@@ -100,454 +116,518 @@ export default function Stock() {
 
     useEffect(() => {
         getStock();
+        getTotalStock()
     }, [])
 
     return (
         <div className="flex bg-black items-center py-5 w-screen flex-col">
-            <div className='text-4xl font-semibold tracking-widest leading-8'>
-                <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>STO</span>CK
+            <div className='flex flex-col space-y-2 items-center'> 
+                <div className='text-4xl font-semibold tracking-widest leading-8'>
+                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>STO</span>CK
+                </div>
+                <div className="flex items-center space-x-4">
+                    <h2 className="text-zinc-600 text-lg font-semibold">Total Stock: </h2>
+                    <input type="checkbox" id="isveg" name="isveg" className="h-[20px] w-[20px]" checked={view} onChange={(e) => setView(!view)} />
+                </div>
             </div>
-            <div className='flex flex-col items-center p-10 space-y-10'>
-                <div className='text-3xl font-semibold tracking-widest leading-8'>
-                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>MEAT </span> STOCK
-                </div>
-                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
-                    <thead className='border-b border-white'>
-                        <tr>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
+            {!view
+                ?
+                <div className='flex flex-col items-center p-10 space-y-10'>
+                    <div className='text-3xl font-semibold tracking-widest leading-8'>
+                        <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>MEAT </span> STOCK
+                    </div>
+                    <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                        <thead className='border-b border-white'>
+                            <tr>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Serial No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Batch No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''>
                                     <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Serial No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Batch No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''>
-                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                    Ingredient</span> Name
-                            </th>
-                            <th className=' w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Quantity
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                UO</span>M
-                            </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Supplied
-                            </span> Date
-                            </th>
-                            <th className='w-[325px]'>
-                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
-                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
-                                        <span className='text-green-700 text-2xl transition-all'>
-                                            +
-                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                            Add</span> Stock</span>
-                                    </button>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    {mstock.map((ele, index) => (
-                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
-                            <tr key={index}>
-                                <td className='flex justify-center py-2'>{index + 1}</td>
-                                <td className=''>
-                                    <div className='flex justify-center text-zinc-600'>
-                                        {ele.SID}
-                                    </div>
-                                </td>
-                                <td className=''>
+                                        Ingredient</span> Name
+                                </th>
+                                <th className=' w-[100px]'>
                                     <div className='flex justify-center'>
-                                        {ele.INAME}
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Quantity
+                                        </span>
                                     </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {Math.round(ele.QTY * 100) / 100}
+                                </th>
+                                <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    UO</span>M
+                                </th>
+                                <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Supplied
+                                </span> Date
+                                </th>
+                                <th className='w-[325px]'>
+                                    <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                        <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                            <span className='text-green-700 text-2xl transition-all'>
+                                                +
+                                            </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                                Add</span> Stock</span>
+                                        </button>
                                     </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        g/ml
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {formatDate(ele.SUPPLIED_DATE)}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    {mode !== 'remove'
-                                        ? <div className='flex justify-center space-x-8'>
-                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-blue-700 text-2xl transition-all'>
-                                                    +
-                                                </span ><span className='text-lg'>Edit</span>
-                                            </button>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
-                                        </div>
-                                        :
-                                        <div className='flex justify-center'>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
-                                        </div>
-                                    }
-                                </td>
+                                </th>
                             </tr>
-                        </tbody>
-                    ))}
-                </table>
-                <div className='text-3xl font-semibold tracking-widest leading-8'>
-                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>VEGETABLE </span> STOCK
-                </div>
-                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
-                    <thead className='border-b border-white'>
-                        <tr>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Serial No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Batch No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''>
-                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                    Ingredient</span> Name
-                            </th>
-                            <th className=' w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Quantity
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                UO</span>M
-                            </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Supplied
-                            </span> Date
-                            </th>
-                            <th className='w-[325px]'>
-                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
-                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
-                                        <span className='text-green-700 text-2xl transition-all'>
-                                            +
-                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                            Add</span> Stock</span>
-                                    </button>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    {vstock.map((ele, index) => (
-                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
-                            <tr key={index}>
-                                <td className='flex justify-center py-2'>{index + 1}</td>
-                                <td className=''>
-                                    <div className='flex justify-center text-zinc-600'>
-                                        {ele.SID}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {ele.INAME}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {Math.round(ele.QTY * 100) / 100}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        g/ml
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {formatDate(ele.SUPPLIED_DATE)}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    {mode !== 'remove'
-                                        ? <div className='flex justify-center space-x-8'>
-                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-blue-700 text-2xl transition-all'>
-                                                    +
-                                                </span ><span className='text-lg'>Edit</span>
-                                            </button>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
+                        </thead>
+                        {mstock.map((ele, index) => (
+                            <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                                <tr key={index}>
+                                    <td className='flex justify-center py-2'>{index + 1}</td>
+                                    <td className=''>
+                                        <div className='flex justify-center text-zinc-600'>
+                                            {ele.SID}
                                         </div>
-                                        :
+                                    </td>
+                                    <td className=''>
                                         <div className='flex justify-center'>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
+                                            {ele.INAME}
                                         </div>
-                                    }
-                                </td>
-                            </tr>
-                        </tbody>
-                    ))}
-                </table>
-                <div className='text-3xl font-semibold tracking-widest leading-8'>
-                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>GROCERIES </span> STOCK
-                </div>
-                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
-                    <thead className='border-b border-white'>
-                        <tr>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Serial No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Batch No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''>
-                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                    Ingredient</span> Name
-                            </th>
-                            <th className=' w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Quantity
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                UO</span>M
-                            </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Supplied
-                            </span> Date
-                            </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Expiry
-                            </span> Date
-                            </th>
-                            <th className='w-[325px]'>
-                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
-                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
-                                        <span className='text-green-700 text-2xl transition-all'>
-                                            +
-                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                            Add</span> Stock</span>
-                                    </button>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    {gstock.map((ele, index) => (
-                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
-                            <tr key={index}>
-                                <td className='flex justify-center py-2'>{index + 1}</td>
-                                <td className=''>
-                                    <div className='flex justify-center text-zinc-600'>
-                                        {ele.SID}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {ele.INAME}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {Math.round(ele.QTY * 100) / 100}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        g/ml
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {formatDate(ele.SUPPLIED_DATE)}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {formatDate(ele.EXP_DATE)}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    {mode !== 'remove'
-                                        ? <div className='flex justify-center space-x-8'>
-                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-blue-700 text-2xl transition-all'>
-                                                    +
-                                                </span ><span className='text-lg'>Edit</span>
-                                            </button>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
-                                        </div>
-                                        :
+                                    </td>
+                                    <td className=''>
                                         <div className='flex justify-center'>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
+                                            {Math.round(ele.QTY * 100) / 100}
                                         </div>
-                                    }
-                                </td>
-                            </tr>
-                        </tbody>
-                    ))}
-                </table>
-                <div className='text-3xl font-semibold tracking-widest leading-8'>
-                    <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>CONDIMENTS </span> STOCK
-                </div>
-                <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
-                    <thead className='border-b border-white'>
-                        <tr>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Serial No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=' py-2 w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Batch No.
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''>
-                                <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                    Ingredient</span> Name
-                            </th>
-                            <th className=' w-[100px]'>
-                                <div className='flex justify-center'>
-                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                        Quantity
-                                    </span>
-                                </div>
-                            </th>
-                            <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                UO</span>M
-                            </th>
-                            <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                Supplied
-                            </span> Date
-                            </th>
-                            <th className='w-[325px]'>
-                                <div className='hover:scale-[1.1] transition-all flex justify-center'>
-                                    <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
-                                        <span className='text-green-700 text-2xl transition-all'>
-                                            +
-                                        </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
-                                            Add</span> Stock</span>
-                                    </button>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    {cstock.map((ele, index) => (
-                        <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
-                            <tr key={index}>
-                                <td className='flex justify-center py-2'>{index + 1}</td>
-                                <td className=''>
-                                    <div className='flex justify-center text-zinc-600'>
-                                        {ele.SID}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {ele.INAME}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {Math.round(ele.QTY * 100) / 100}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        g/ml
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    <div className='flex justify-center'>
-                                        {formatDate(ele.SUPPLIED_DATE)}
-                                    </div>
-                                </td>
-                                <td className=''>
-                                    {mode !== 'remove'
-                                        ? <div className='flex justify-center space-x-8'>
-                                            <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-blue-700 text-2xl transition-all'>
-                                                    +
-                                                </span ><span className='text-lg'>Edit</span>
-                                            </button>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
-                                        </div>
-                                        :
+                                    </td>
+                                    <td className=''>
                                         <div className='flex justify-center'>
-                                            <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
-                                                <span className='text-red-700 text-2xl transition-all'>
-                                                    -
-                                                </span ><span className='text-lg'>Remove</span>
-                                            </button>
+                                            g/ml
                                         </div>
-                                    }
-                                </td>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {formatDate(ele.SUPPLIED_DATE)}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        {mode !== 'remove'
+                                            ? <div className='flex justify-center space-x-8'>
+                                                <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-blue-700 text-2xl transition-all'>
+                                                        +
+                                                    </span ><span className='text-lg'>Edit</span>
+                                                </button>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                            :
+                                            <div className='flex justify-center'>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ))}
+                    </table>
+                    <div className='text-3xl font-semibold tracking-widest leading-8'>
+                        <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>VEGETABLE </span> STOCK
+                    </div>
+                    <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                        <thead className='border-b border-white'>
+                            <tr>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Serial No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Batch No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Ingredient</span> Name
+                                </th>
+                                <th className=' w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Quantity
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    UO</span>M
+                                </th>
+                                <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Supplied
+                                </span> Date
+                                </th>
+                                <th className='w-[325px]'>
+                                    <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                        <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                            <span className='text-green-700 text-2xl transition-all'>
+                                                +
+                                            </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                                Add</span> Stock</span>
+                                        </button>
+                                    </div>
+                                </th>
                             </tr>
-                        </tbody>
-                    ))}
-                </table>
-
-
-            </div>
+                        </thead>
+                        {vstock.map((ele, index) => (
+                            <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                                <tr key={index}>
+                                    <td className='flex justify-center py-2'>{index + 1}</td>
+                                    <td className=''>
+                                        <div className='flex justify-center text-zinc-600'>
+                                            {ele.SID}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {ele.INAME}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {Math.round(ele.QTY * 100) / 100}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            g/ml
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {formatDate(ele.SUPPLIED_DATE)}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        {mode !== 'remove'
+                                            ? <div className='flex justify-center space-x-8'>
+                                                <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-blue-700 text-2xl transition-all'>
+                                                        +
+                                                    </span ><span className='text-lg'>Edit</span>
+                                                </button>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                            :
+                                            <div className='flex justify-center'>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ))}
+                    </table>
+                    <div className='text-3xl font-semibold tracking-widest leading-8'>
+                        <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>GROCERIES </span> STOCK
+                    </div>
+                    <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                        <thead className='border-b border-white'>
+                            <tr>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Serial No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Batch No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Ingredient</span> Name
+                                </th>
+                                <th className=' w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Quantity
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    UO</span>M
+                                </th>
+                                <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Supplied
+                                </span> Date
+                                </th>
+                                <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Expiry
+                                </span> Date
+                                </th>
+                                <th className='w-[325px]'>
+                                    <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                        <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                            <span className='text-green-700 text-2xl transition-all'>
+                                                +
+                                            </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                                Add</span> Stock</span>
+                                        </button>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        {gstock.map((ele, index) => (
+                            <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                                <tr key={index}>
+                                    <td className='flex justify-center py-2'>{index + 1}</td>
+                                    <td className=''>
+                                        <div className='flex justify-center text-zinc-600'>
+                                            {ele.SID}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {ele.INAME}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {Math.round(ele.QTY * 100) / 100}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            g/ml
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {formatDate(ele.SUPPLIED_DATE)}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {formatDate(ele.EXP_DATE)}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        {mode !== 'remove'
+                                            ? <div className='flex justify-center space-x-8'>
+                                                <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-blue-700 text-2xl transition-all'>
+                                                        +
+                                                    </span ><span className='text-lg'>Edit</span>
+                                                </button>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                            :
+                                            <div className='flex justify-center'>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ))}
+                    </table>
+                    <div className='text-3xl font-semibold tracking-widest leading-8'>
+                        <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>CONDIMENTS </span> STOCK
+                    </div>
+                    <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                        <thead className='border-b border-white'>
+                            <tr>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Serial No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Batch No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Ingredient</span> Name
+                                </th>
+                                <th className=' w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Quantity
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    UO</span>M
+                                </th>
+                                <th className='w-[150px]'><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    Supplied
+                                </span> Date
+                                </th>
+                                <th className='w-[325px]'>
+                                    <div className='hover:scale-[1.1] transition-all flex justify-center'>
+                                        <button onClick={handleAdd} className='flex items-center justify-center space-x-3'>
+                                            <span className='text-green-700 text-2xl transition-all'>
+                                                +
+                                            </span ><span className='text-lg'> <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                                Add</span> Stock</span>
+                                        </button>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        {cstock.map((ele, index) => (
+                            <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                                <tr key={index}>
+                                    <td className='flex justify-center py-2'>{index + 1}</td>
+                                    <td className=''>
+                                        <div className='flex justify-center text-zinc-600'>
+                                            {ele.SID}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {ele.INAME}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {Math.round(ele.QTY * 100) / 100}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            g/ml
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {formatDate(ele.SUPPLIED_DATE)}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        {mode !== 'remove'
+                                            ? <div className='flex justify-center space-x-8'>
+                                                <button onClick={() => handleEdit(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-blue-700 text-2xl transition-all'>
+                                                        +
+                                                    </span ><span className='text-lg'>Edit</span>
+                                                </button>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className='hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                            :
+                                            <div className='flex justify-center'>
+                                                <button onClick={() => handleRemove(ele.ID)} type="button" className={`${select.includes(ele.ID) ? 'scale-[1.1] font-bold text-red-800' : 'hover:scale-[1.1]'}  transition-all flex items-center justify-center space-x-1`}>
+                                                    <span className='text-red-700 text-2xl transition-all'>
+                                                        -
+                                                    </span ><span className='text-lg'>Remove</span>
+                                                </button>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        ))}
+                    </table>
+                </div>
+                :
+                <div className='flex flex-col items-center p-10 space-y-10'>
+                    <div className='text-3xl font-semibold tracking-widest leading-8'>
+                        <span className='bg-gradient-to-b from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>TOTAL </span> STOCK
+                    </div>
+                    <table className="bg-zinc-900 rounded-2xl w-[1400px] ">
+                        <thead className='border-b border-white'>
+                            <tr>
+                                <th className=' py-2 w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Serial No.
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''>
+                                    <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                        Ingredient</span> Name
+                                </th>
+                                <th className=' w-[100px]'>
+                                    <div className='flex justify-center'>
+                                        <span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                            Quantity
+                                        </span>
+                                    </div>
+                                </th>
+                                <th className=''><span className='bg-gradient-to-t from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text'>
+                                    UO</span>M
+                                </th>
+                            </tr>
+                        </thead>
+                        {totalStock.map((ele, index) => (
+                            <tbody className='border-t border-zinc-700 hover:bg-[#202022] transition-all'>
+                                <tr key={index}>
+                                    <td className='flex justify-center py-2'>{index + 1}</td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {ele.INAME}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {Math.round(ele.QTY * 100) / 100}
+                                        </div>
+                                    </td>
+                                    <td className=''>
+                                        <div className='flex justify-center'>
+                                            {ele.UOM}
+                                        </div>
+                                    </td>
+                                    
+                                </tr>
+                            </tbody>
+                        ))}
+                    </table>
+                </div>
+            }
             {mode === 'remove' ?
                 <div className='p-3 fixed bottom-0 right-0 '>
                     <div className='space-x-10 py-7 px-7 bg-zinc-700 rounded-lg bg-opacity-40'>

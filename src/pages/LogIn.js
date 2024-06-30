@@ -17,6 +17,8 @@ export default function LogIn() {
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
 
+    const [view, setView] = useState(false);
+
     const [error, setError] = useState('');
     const router = useRouter();
 
@@ -139,21 +141,37 @@ export default function LogIn() {
                                 </div>
                             </div>
                             <div className='flex flex-col px-12 py-12 space-y-[50px] bg-zinc-900 h-[485px] w-[485px] rounded-r-lg'>
-                                <h2 className="text-3xl font-bold tracking-wider leading-9 space-x-2">
+                                <h2 onClick={(e) => setView(!view)} className="text-3xl cursor-pointer font-bold tracking-wider leading-9 space-x-2">
                                     <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text ">
                                         LOG
                                     </span>
                                     <span>IN</span>
                                 </h2>
                                 <div>
-                                    <span>
-                                        <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
-                                            <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
-                                                Name
-                                            </span>
-                                        </h2>
-                                        <input type="text" value={`${name}`} onChange={(e) => setName(e.target.value)} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
-                                    </span>
+                                    {!view
+                                        ?
+                                        <span>
+                                            <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
+                                                <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
+                                                    Name
+                                                </span>
+                                            </h2>
+                                            <input type="text" value={`${name}`} onChange={(e) => setName(e.target.value)} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg" />
+                                        </span>
+                                        :
+                                        <span>
+                                            <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
+                                                <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
+                                                    Name
+                                                </span>
+                                            </h2>
+                                            <select value={name} onChange={(e) => setName(e.target.value)} className="p-1 border bg-zinc-900 border-2 border-white text-white h-[45px] w-[250px] rounded-lg">
+                                                {users.map((user, index) => (
+                                                    <option key={index} value={user.NAME}>{user.NAME}</option>
+                                                ))}
+                                            </select>
+                                        </span>
+                                    }
                                     <span>
                                         <h2 className="bg-zinc-900 p-1 w-fit h-fit translate-x-4 translate-y-3 rounded-lg font-semibold tracking-wide leading-4">
                                             <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text">
