@@ -17,9 +17,9 @@ const DigitalClock = ({ setTiming }) => {
         let newGreeting;
         if (hours >= 6 && hours < 12) {
             newGreeting = 'Morning';
-        } else if (hours >= 12 && hours < 18) {
+        } else if (hours >= 12 && hours < 15) {
             newGreeting = 'Afternoon';
-        } else if (hours >= 18 && hours < 21) {
+        } else if (hours >= 15 && hours < 21) {
             newGreeting = 'Evening';
         } else {
             newGreeting = 'Night';
