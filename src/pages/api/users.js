@@ -8,11 +8,18 @@ const filePath = path.join(process.cwd(), 'src/pages/local/userbuffer.json');
 export default async function handler(req, res) {
 
     if (req.method == "GET") {
+        
         const users = await query({
             query: "SELECT * FROM USERS",
             values: []
         })
-        res.status(200).json({ users });
+
+        const neworder = await query({
+            query: "SELECT MAX(ID)+1 MAX FROM ORDERS",
+            values: []
+        })
+
+        res.status(200).json({ users, neworder });
     } else if (req.method == "PUT") {
         try {
             const { index } = req.body;

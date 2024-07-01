@@ -16,6 +16,8 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
 
     const [isCanceling, setIsCanceling] = useState(false);
 
+    const orderId= sessionStorage.getItem('OrderId')
+
     function handleClose() {
         setModal(false);
     }
@@ -112,7 +114,7 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
             headers: {
                 "Content-type": "application/json",
             },
-            body: JSON.stringify({ name: session?.user?.name, cart: cart, qty: qty, phone: phone, price: price })
+            body: JSON.stringify({ id:orderId,name: session?.user?.name, cart: cart, qty: qty, phone: phone, price: price })
         }
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/orders`, postData);
         handleCancel();
@@ -127,6 +129,8 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
     }, [mode])
 
     useEffect(() => console.log(phone), [phone])
+
+    useEffect(()=> console.log(orderId),[orderId])
 
     if (!isVisible) return null;
 
@@ -219,7 +223,7 @@ export default function CartModal({ isVisible, setModal, cart, setCart, qty, set
                                                         </div>
                                                     </div>
                                                     <div className='flex space-x-5 items-center'>
-                                                        {ele.STATUS !== 'Pending' && ele.STATUS !== 'Cancelled'
+                                                        {ele.STATUS !== 'Pending' && ele.STATUS !== 'Cancelled' && ele.STATUS !== 'Accepted'
                                                             ? <Link href={`/Bill?id=${ele.ID}`}>
                                                                 <button type="button" className='bg-zinc-700 hover:bg-blue-700 p-2 rounded-full px-5 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
                                                                     Pay

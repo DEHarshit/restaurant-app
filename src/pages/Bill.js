@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react"
 import { useSession } from 'next-auth/react';
+import { signOut } from 'next-auth/react';
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
@@ -49,6 +50,7 @@ export default function Bill() {
             const response = await res.json();
             setOrder(response.order[0]);
             setOrdetails(response.ordetails);
+            signOut();
         }
     }
 
@@ -92,6 +94,13 @@ export default function Bill() {
                 });
 
                 pdf.setFont('helvetica');
+
+                const HeaderText = 'DRMLUASN'
+                const pageWidth2 = pdf.internal.pageSize.getWidth();
+                pdf.setFontSize(20);
+                const textWidth3 = pdf.getTextWidth(HeaderText);
+                const textX3 = (pageWidth2 - textWidth3) / 2;
+                pdf.text(HeaderText, textX3, pdf.internal.pageSize.getHeight()-800);
 
                 pdf.setFontSize(16);
                 pdf.text(`Receipt #${order.ID}`, startX, startY - 30);

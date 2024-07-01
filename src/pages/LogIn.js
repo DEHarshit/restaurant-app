@@ -1,14 +1,19 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react"
-import { signIn } from 'next-auth/react';
+import { useSession,signIn, signOut } from 'next-auth/react';
 import Link from "next/link";
 
 export default function LogIn() {
+
+    
+    const { data: session, status } = useSession();
 
     const [log, setLog] = useState(true);
     const [visible, setVisible] = useState(false);
     const [transition, setTransition] = useState(false);
     const [users, setUsers] = useState([]);
+
+    const [orderId, setOrderId] = useState('');
 
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
@@ -21,6 +26,7 @@ export default function LogIn() {
 
     const [error, setError] = useState('');
     const router = useRouter();
+    const { so } = router.query;
 
     const handleLogIn = async (e) => {
         e.preventDefault();
@@ -34,9 +40,13 @@ export default function LogIn() {
                     setError(result.error)
                 } else {
                     if (user.ROLE === 'Customer') {
-                        setTimeout(() => router.push('/HomePage'), 200);
+                        setError("Logging In")
+                        sessionStorage.setItem("OrderId", JSON.stringify(orderId === undefined ? 1 : orderId));
+                        setTimeout(() => router.push('/HomePage'), 300);
                     } else {
-                        setTimeout(() => router.push('/Admin'), 200);
+                        setError("Logging In")
+                        sessionStorage.setItem("OrderId", JSON.stringify(orderId === undefined ? 1 : orderId));
+                        setTimeout(() => router.push('/Admin'), 300);
                     }
                 }
             } else {
@@ -93,7 +103,7 @@ export default function LogIn() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users`, postData);
         const response = await res.json();
         setUsers(response.users);
-        console.log(response.users);
+        setOrderId(response.neworder[0].MAX);
     }
 
     function handleLog() {
@@ -110,10 +120,33 @@ export default function LogIn() {
 
     }
 
+    useEffect(()=>{
+        console.log(orderId)
+    },[orderId])
+
+    useEffect(()=>{
+        console.log(users)
+    },[users])
+
+
     useEffect(() => {
         getUsers();
     }, [])
 
+    useEffect(() => {
+        const signOutAndRedirect = async () => {
+            if (session) {
+                await signOut({ redirect: false });
+                router.push('/LogIn');
+            }
+        };
+    
+        if (so === '1') {
+            signOutAndRedirect();
+        }
+    }, [so]);
+
+    
 
     return (
         <div className="relative h-screen flex justify-center items-center font-primary">

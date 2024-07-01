@@ -73,7 +73,7 @@ export default function Bills() {
                                             Today's Revenues
                                         </h2>
                                         <h2>
-                                            {trev}
+                                            ₹ {trev}
                                         </h2>
                                     </div>
                                     <div className='flex flex-col items-center'>
@@ -81,7 +81,7 @@ export default function Bills() {
                                             Today's Expenses
                                         </h2>
                                         <h2>
-                                            {texp}
+                                            ₹ {texp}
                                         </h2>
                                     </div>
                                 </div>
@@ -100,7 +100,7 @@ export default function Bills() {
                                                 </div>
                                             </div>
                                             <h2 className='text-5xl text-green-600'>
-                                                {Math.floor(trev - texp)}
+                                                ₹ {Math.floor(trev - texp)}
                                             </h2>
                                         </div>
                                     </div>
@@ -118,7 +118,7 @@ export default function Bills() {
                                                     </div>
                                                 </div>
                                                 <h2 className='text-5xl'>
-                                                    {Math.floor(trev - texp)}
+                                                    ₹ {Math.floor(trev - texp)}
                                                 </h2>
                                             </div>
                                         </div>
@@ -136,7 +136,7 @@ export default function Bills() {
                                                     </div>
                                                 </div>
                                                 <h2 className='text-5xl text-red-600'>
-                                                    {Math.floor(trev - texp)}
+                                                    ₹ {Math.floor(trev - texp)}
                                                 </h2>
                                             </div>
                                         </div>

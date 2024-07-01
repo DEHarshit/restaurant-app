@@ -29,7 +29,7 @@ export default async function handler(req, res) {
             })
 
             const ordetails = await query({
-                query: "SELECT * FROM ORDETAILS WHERE OID=?",
+                query: "SELECT OID,DNAME,SUM(QTY) QTY,SUM(PRICE) PRICE FROM ORDETAILS WHERE OID=? GROUP BY OID,DNAME",
                 values: [id]
             })
 
@@ -56,7 +56,7 @@ export default async function handler(req, res) {
             })
 
             const ordetails = await query({
-                query: "SELECT * FROM ORDETAILS WHERE OID=?",
+                query: "SELECT OID,DNAME,SUM(QTY) QTY,SUM(PRICE) PRICE FROM ORDETAILS WHERE OID=? GROUP BY OID,DNAME",
                 values: [id]
             })
 

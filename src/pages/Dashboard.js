@@ -272,7 +272,7 @@ export default function Dashboard({ timing }) {
                           Today's Revenues
                         </h2>
                         <h2>
-                          {trev}
+                        ₹ {trev}
                         </h2>
                       </div>
                       <div className='flex flex-col items-center'>
@@ -280,7 +280,7 @@ export default function Dashboard({ timing }) {
                           Today's Expenses
                         </h2>
                         <h2>
-                          {texp}
+                        ₹ {texp}
                         </h2>
                       </div>
                     </div>
@@ -299,7 +299,7 @@ export default function Dashboard({ timing }) {
                             </div>
                           </div>
                           <h2 className='text-5xl text-green-600'>
-                            {Math.floor(trev - texp)}
+                          ₹ {Math.floor(trev - texp)}
                           </h2>
                         </div>
                       </div>
@@ -317,7 +317,7 @@ export default function Dashboard({ timing }) {
                               </div>
                             </div>
                             <h2 className='text-5xl'>
-                              {Math.floor(trev - texp)}
+                            ₹ {Math.floor(trev - texp)}
                             </h2>
                           </div>
                         </div>
@@ -335,7 +335,7 @@ export default function Dashboard({ timing }) {
                               </div>
                             </div>
                             <h2 className='text-5xl text-red-600'>
-                              {Math.floor(trev - texp)}
+                            ₹ {Math.floor(trev - texp)}
                             </h2>
                           </div>
                         </div>
@@ -354,9 +354,9 @@ export default function Dashboard({ timing }) {
 
               <div className="w-[900px] h-[180px] p-10 mb-5 bg-gradient-to-t from-zinc-900 to-stone-800 shadow-md rounded border border-gray-300">
                 <TransactionSummary
-                  success={tSum[0].COUNT}
-                  cancel={tSum[1].COUNT}
-                  totalord={totalOrders[0].COUNT}
+                  success={(tSum && tSum.length > 0 && tSum[0].COUNT) || 0}
+                  cancel={(tSum && tSum.length > 1 && tSum[1].COUNT) || 0}
+                  totalord={(totalOrders && totalOrders.length > 0 && totalOrders[0].COUNT) || 0}
                 />
               </div>
             </div>

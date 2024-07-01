@@ -11,41 +11,65 @@ export default async function handler(req, res) {
             query: "SELECT * FROM ORDETAILS",
             values: []
         })
-        res.status(200).json({ orders,ordetails });
+
+        res.status(200).json({ orders, ordetails });
     } else if (req.method == "POST") {
         try {
-            const { name, cart, qty, phone, price } = req.body;
+            const { id, name, cart, qty, phone, price } = req.body;
 
-            await query({
-                query: "INSERT INTO ORDERS (NAME,ORDPHONE,STATUS,DATE,PSTATUS) VALUES (?,?,?,NOW(),'Not Paid')",
-                values: [name, phone, 'Pending']
-            })
-
-            const result = await query({
-                query: "SELECT ID FROM ORDERS ORDER BY ID DESC LIMIT 1"
-            })
-
-            const id = result[0]?.ID;
-
-            for (let i = 0; i < cart.length; i++) {
-                await query({
-                    query: "INSERT INTO ORDETAILS (OID,DNAME,QTY,PRICE) VALUES (?,?,?,?)",
-                    values: [id,cart[i],qty[i],price[i]]
-
-                })
-            }
-
-            const rest = await query({
-                query:"SELECT SUM(PRICE) AS PRICE FROM ORDETAILS WHERE OID=?",
+            const existingOrder = await query({
+                query: "SELECT ID FROM ORDERS WHERE ID = ?",
                 values: [id]
             });
 
-            const total = rest[0]?.PRICE;
+            if (existingOrder.length > 0) {
+                
+                for (let i = 0; i < cart.length; i++) {
+                    await query({
+                        query: "INSERT INTO ORDETAILS (OID,DNAME,QTY,PRICE) VALUES (?,?,?,?)",
+                        values: [id, cart[i], qty[i], price[i]]
 
-            await query({
-                query:"UPDATE ORDERS SET PRICE=? WHERE ID=?",
-                values:[total,id]
-            })
+                    })
+                }
+                const rest = await query({
+                    query: "SELECT SUM(PRICE) AS PRICE FROM ORDETAILS WHERE OID=?",
+                    values: [id]
+                });
+
+                const total = rest[0]?.PRICE;
+
+                await query({
+                    query: "UPDATE ORDERS SET PRICE=? WHERE ID=?",
+                    values: [total, id]
+                })
+
+            } else {
+                await query({
+                    query: "INSERT INTO ORDERS (ID,NAME,ORDPHONE,STATUS,DATE,PSTATUS) VALUES (?,?,?,?,NOW(),'Not Paid')",
+                    values: [id, name, phone, 'Pending']
+                })
+
+                for (let i = 0; i < cart.length; i++) {
+                    await query({
+                        query: "INSERT INTO ORDETAILS (OID,DNAME,QTY,PRICE) VALUES (?,?,?,?)",
+                        values: [id, cart[i], qty[i], price[i]]
+
+                    })
+                }
+
+                const rest = await query({
+                    query: "SELECT SUM(PRICE) AS PRICE FROM ORDETAILS WHERE OID=?",
+                    values: [id]
+                });
+
+                const total = rest[0]?.PRICE;
+
+                await query({
+                    query: "UPDATE ORDERS SET PRICE=? WHERE ID=?",
+                    values: [total, id]
+                })
+
+            }
 
             res.status(200).json({ success: true });
         } catch (error) {
@@ -54,7 +78,7 @@ export default async function handler(req, res) {
 
     } else if (req.method == "DELETE") {
         try {
-            
+
             const { id } = req.body;
 
             await query({
@@ -76,17 +100,17 @@ export default async function handler(req, res) {
 
     } else if (req.method == "PUT") {
         try {
-            const { id,status } = req.body;
+            const { id, status } = req.body;
 
-            
-            if (status === 'Accepted'){
+
+            if (status === 'Accepted') {
                 await query({
                     query: "UPDATE ORDERS SET STATUS = 'Finished' WHERE ID=?",
                     values: [id]
                 })
             }
 
-            if (status === 'Pending'){
+            if (status === 'Pending') {
                 await query({
                     query: "UPDATE ORDERS SET STATUS = 'Accepted' WHERE ID=?",
                     values: [id]
@@ -104,5 +128,5 @@ export default async function handler(req, res) {
             res.status(500).json({ success: false, error: error.message });
         }
 
-    } 
+    }
 }

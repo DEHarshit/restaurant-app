@@ -9,6 +9,7 @@ export default function Header({ cart, setCart, qty, setQty, price, setPrice, cP
 
     const [modal, setModal] = useState(false)
 
+
     return (
         <div className="flex items-center justify-between p-5">
             <div className="flex flex-col items-center ">
@@ -66,9 +67,11 @@ export default function Header({ cart, setCart, qty, setQty, price, setPrice, cP
                     </div>
 
                     <div className='flex flex-col space-y-1 items-center'>
-                        <button onClick={signOut} type="button" className="scale-[0.9] hover:scale-[1] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
-                            Sign Out
-                        </button>
+                        <Link href={`/LogIn?so=1`}>
+                            <button type="button" className="scale-[0.9] hover:scale-[1] w-fit h-fit bg-zinc-400 hover:text-white text-md text-black p-2 font-semibold transition-all duration-400 rounded-full hover:bg-gradient-to-r from-[#CEA07E] to-[#BB5656]">
+                                Sign Out
+                            </button>
+                        </Link>
                         <Link href={`/ChangePass`}>
                             <h2 className="hover:scale-[1.03] cursor-pointer transition-all px-4 text-sm text-zinc-400 space-x-1">
                                 <div>
