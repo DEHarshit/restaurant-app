@@ -23,7 +23,7 @@ export default function Dashboard({ timing }) {
   const texp = expense[expense.length - 1];
   const trev = revenue[revenue.length - 1];
   let slno = 0
-  const isSaturday = new Date().getDay() === 0 || new Date().getDay() === 6;
+  const isSaturday = new Date().getDay() === 2 || new Date().getDay() === 6;
 
   async function getTotalMenu() {
     const res = await fetch("http://localhost:3000/api/dashboard");

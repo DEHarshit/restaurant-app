@@ -20,7 +20,7 @@ export default function HomePage(){
     }
 
     return(
-        <div className="relative flex flex-col h-screen">
+        <div className="relative flex flex-col h-screen font-primary">
             <div style={{backgroundImage: `url(/home-image.jpg)`, 
                         backgroundSize: "cover", 
                         backgroundPosition: "center"}} 

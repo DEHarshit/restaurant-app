@@ -44,13 +44,13 @@ export default function Bill() {
                 headers: {
                     "Content-type": "application/json",
                 },
-                body: JSON.stringify({ id: id, user: userId, price: total, phone: phone, name:session?.user?.name })
+                body: JSON.stringify({ id: id, user: userId, price: total, phone: phone, name: session?.user?.name })
             };
             const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/bill`, postData);
             const response = await res.json();
             setOrder(response.order[0]);
             setOrdetails(response.ordetails);
-            signOut();
+            sessionStorage.setItem("OrderId", JSON.stringify(response.neworder[0].MAX));
         }
     }
 
@@ -65,7 +65,6 @@ export default function Bill() {
             }
             const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/getphone`, postData);
             const response = await res.json();
-            console.log(response)
             if (response) {
                 setPhone(response.phone[0].PHONE);
                 setUserId(response.id[0].ID);
@@ -83,7 +82,7 @@ export default function Bill() {
         const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
         html2canvas(input, { scale: 2 })
-            .then((canvas) => {
+            .then(async (canvas) => {
                 const canvasWidth = canvas.width;
                 const canvasHeight = canvas.height;
 
@@ -100,7 +99,7 @@ export default function Bill() {
                 pdf.setFontSize(20);
                 const textWidth3 = pdf.getTextWidth(HeaderText);
                 const textX3 = (pageWidth2 - textWidth3) / 2;
-                pdf.text(HeaderText, textX3, pdf.internal.pageSize.getHeight()-800);
+                pdf.text(HeaderText, textX3, pdf.internal.pageSize.getHeight() - 800);
 
                 pdf.setFontSize(16);
                 pdf.text(`Receipt #${order.ID}`, startX, startY - 30);
@@ -168,10 +167,11 @@ export default function Bill() {
                 pdf.text(footerText2, textX2, pdf.internal.pageSize.getHeight() - 30);
 
                 pdf.save(`restaurant_bill_${order.ID}.pdf`);
+
             });
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         getPhone()
     })
 

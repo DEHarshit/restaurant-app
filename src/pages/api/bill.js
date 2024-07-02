@@ -33,7 +33,13 @@ export default async function handler(req, res) {
                 values: [id]
             })
 
-            res.status(200).json({ order, ordetails });
+            const neworder = await query({
+                query: "SELECT MAX(ID)+1 MAX FROM ORDERS",
+                values: []
+            })
+    
+
+            res.status(200).json({ order, ordetails, neworder });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
         }
