@@ -114,7 +114,7 @@ export default function Bill() {
 
       pdf.setFont("helvetica");
 
-      const HeaderText = "DRMLUASN";
+      const HeaderText = "DRB-DDMSN";
       const pageWidth2 = pdf.internal.pageSize.getWidth();
       pdf.setFontSize(20);
       const textWidth3 = pdf.getTextWidth(HeaderText);
