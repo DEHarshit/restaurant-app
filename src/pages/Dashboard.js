@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import BarChart from "./components/BarChart";
 import TransactionSummary from "./components/TransactionSummary";
-import PieChart from "./components/PieChart";
 
 export default function Dashboard({ timing }) {
   const [totalMenu, setTotalMenu] = useState(0);
@@ -20,6 +19,8 @@ export default function Dashboard({ timing }) {
   const [revenue, setRevenue] = useState([]);
   const [expense, setExpense] = useState([]);
   const [genbills, setGenBills] = useState(0);
+  const [stores, setStores] = useState('');
+  const [remindDate, setRemindDate] = useState('');
   const texp = expense[expense.length - 1];
   const trev = revenue[revenue.length - 1];
   let slno = 0;
@@ -45,19 +46,28 @@ export default function Dashboard({ timing }) {
   }
 
   async function send_mail() {
-    const postData = {
-      method: "PUT",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify({ email: "sivadarshini3112@gmail.com" }),
-    };
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/sendemail`,
-      postData
-    );
-    const response = await res.text();
-    console.log(response)
+    if (timing === 'N') {
+      const today = new Date().toISOString().split("T")[0];
+      if (remindDate === today) {
+        console.log(stores)
+        const postData = {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({ email: stores }),
+        };
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_URL}/api/sendemail`,
+          postData
+        );
+        const response = await res.text();
+        if (res.status === 200){
+          console.log(response);
+          setRemindDate(response.date)
+        }
+      } // date
+    } // night
   }
 
   async function getReminder() {
@@ -70,14 +80,26 @@ export default function Dashboard({ timing }) {
     setOstock(response.ostock);
   }
 
+  async function getStoresMail() {
+    const res = await fetch("http://localhost:3000/api/sendemail");
+    const response = await res.json();
+    setStores(response.stores[0].EMAIL)
+    setRemindDate(response.date)
+  }
+
   function formatDate(dateString) {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
   }
 
+  useEffect(()=>{
+    send_mail()
+  },[timing,stores])
+
   useEffect(() => {
     getTotalMenu();
     getReminder();
+    getStoresMail();
   }, []);
 
   if (totalMenu == 0) {
@@ -86,7 +108,6 @@ export default function Dashboard({ timing }) {
     return (
       <div className="overflow-x-none min-h-screen">
         <h2
-          onClick={send_mail}
           className="py-5 flex items-center  justify-center font-semibold text-4xl "
         >
           <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">
@@ -102,11 +123,10 @@ export default function Dashboard({ timing }) {
             </div>
             <div className="">
               <div
-                className={`${
-                  lstock.length !== 0 || expiry.length !== 0
+                className={`${lstock.length !== 0 || expiry.length !== 0
                     ? "shadow-red-900 shadow-md border-red-900 border-4 animate-pulse-border"
                     : "border border-gray-300 shadow-md"
-                } w-[530px] h-[380px] mb-5 bg-gradient-to-t from-zinc-900 to-stone-800 rounded overflow-auto`}
+                  } w-[530px] h-[380px] mb-5 bg-gradient-to-t from-zinc-900 to-stone-800 rounded overflow-auto`}
               >
                 <div className="p-4 flex items-center justify-between">
                   <h2 className="text-center font-bold tracking-widest bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text text-2xl mb-4">
@@ -129,58 +149,58 @@ export default function Dashboard({ timing }) {
                 <div className="px-4 space-y-1">
                   {lstock.length !== 0
                     ? lstock.map((ele, index) => {
-                        slno = slno + 1;
-                        return (
-                          <div
-                            className="hover:bg-white hover:bg-opacity-10 p-1 border-b border-zinc-600"
-                            key={index}
-                          >
-                            {slno}. {ele.INAME} is{" "}
-                            <span className="text-lg animate-pulse animate-reduce font-bold text-red-600">
-                              LOW ON STOCK
-                            </span>
-                          </div>
-                        );
-                      })
+                      slno = slno + 1;
+                      return (
+                        <div
+                          className="hover:bg-white hover:bg-opacity-10 p-1 border-b border-zinc-600"
+                          key={index}
+                        >
+                          {slno}. {ele.INAME} is{" "}
+                          <span className="text-lg animate-pulse animate-reduce font-bold text-red-600">
+                            LOW ON STOCK
+                          </span>
+                        </div>
+                      );
+                    })
                     : null}
 
                   {ostock.length !== 0 && out
                     ? ostock.map((ele, index) => {
-                        slno = slno + 1;
-                        return (
-                          <div
-                            className="hover:bg-white hover:bg-opacity-10 p-1 border-b border-zinc-600"
-                            key={index}
-                          >
-                            {slno}. {ele.INAME} is{" "}
-                            <span className="text-lg animate-pulse animate-reduce font-bold text-red-600">
-                              OUT OF STOCK
-                            </span>
-                          </div>
-                        );
-                      })
+                      slno = slno + 1;
+                      return (
+                        <div
+                          className="hover:bg-white hover:bg-opacity-10 p-1 border-b border-zinc-600"
+                          key={index}
+                        >
+                          {slno}. {ele.INAME} is{" "}
+                          <span className="text-lg animate-pulse animate-reduce font-bold text-red-600">
+                            OUT OF STOCK
+                          </span>
+                        </div>
+                      );
+                    })
                     : null}
 
                   {expiry.length !== 0
                     ? expiry.map((ele, index) => {
-                        slno = slno + 1;
-                        return (
-                          <div
-                            className="hover:bg-white hover:bg-opacity-10 p-1 border-b border-zinc-600"
-                            key={index}
-                          >
-                            {slno}. {ele.INAME} Stock{" "}
-                            <span className="text-zinc-500">({ele.SID})</span>{" "}
-                            is{" "}
-                            <span className="text-lg animate-pulse animate-reduce font-bold text-red-600">
-                              EXPIRING SOON
-                            </span>{" "}
-                            <span className="text-zinc-500">
-                              ({formatDate(ele.EXP_DATE)})
-                            </span>
-                          </div>
-                        );
-                      })
+                      slno = slno + 1;
+                      return (
+                        <div
+                          className="hover:bg-white hover:bg-opacity-10 p-1 border-b border-zinc-600"
+                          key={index}
+                        >
+                          {slno}. {ele.INAME} Stock{" "}
+                          <span className="text-zinc-500">({ele.SID})</span>{" "}
+                          is{" "}
+                          <span className="text-lg animate-pulse animate-reduce font-bold text-red-600">
+                            EXPIRING SOON
+                          </span>{" "}
+                          <span className="text-zinc-500">
+                            ({formatDate(ele.EXP_DATE)})
+                          </span>
+                        </div>
+                      );
+                    })
                     : null}
 
                   {"M,N".includes(timing) ? (
@@ -197,9 +217,8 @@ export default function Dashboard({ timing }) {
                         </div>
                         <button type="button" className="px-3">
                           <div
-                            className={` ${
-                              isMeatExpanded ? "rotate-90" : "-rotate-90"
-                            }
+                            className={` ${isMeatExpanded ? "rotate-90" : "-rotate-90"
+                              }
                                         border-t-[7px] border-t-transparent
                                         border-r-[7px] border-r-white hover:border-r-zinc-500
                                         border-b-[7px] border-b-transparent  transition-all duration-300`}
@@ -237,9 +256,8 @@ export default function Dashboard({ timing }) {
                         </div>
                         <button type="button" className="px-3">
                           <div
-                            className={` ${
-                              isVegetableExpanded ? "rotate-90" : "-rotate-90"
-                            } 
+                            className={` ${isVegetableExpanded ? "rotate-90" : "-rotate-90"
+                              } 
                                           border-t-[7px] border-t-transparent 
                                           border-r-[7px] border-r-white hover:border-r-zinc-500 border-b-[7px] 
                                           border-b-transparent  transition-all duration-300`}
@@ -282,8 +300,8 @@ export default function Dashboard({ timing }) {
                     <p className="text-4xl">{genbills}</p>
                   </div>
                   <div>
-                    <p className="text-sm bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">
-                      Bills Generated
+                    <p className="text-[12px] bg-gradient-to-r from-[#CEA07E] to-[#BB5656] inline-block text-transparent bg-clip-text">
+                      BILLS GENERATED
                     </p>
                   </div>
                 </div>
@@ -381,7 +399,7 @@ export default function Dashboard({ timing }) {
                             ></div>
                           </div>
                           <h2 className="text-5xl text-red-600">
-                            ₹ {Math.floor(trev - texp)}
+                            ₹ {Math.floor(trev - texp) * -1}
                           </h2>
                         </div>
                       </div>
