@@ -25,7 +25,7 @@ const DigitalClock = ({ setTiming }) => {
       newGreeting = "Night";
     }
     setGreeting(newGreeting);
-    setGreeting("Night");
+    /* setGreeting("Night"); */
   }, [time]);
 
   useEffect(() => {
