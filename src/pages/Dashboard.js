@@ -335,7 +335,7 @@ export default function Dashboard({ timing }) {
                               </div>
                             </div>
                             <h2 className='text-5xl text-red-600'>
-                            ₹ {Math.floor(trev - texp)}
+                            ₹ {Math.floor((trev - texp)*-1)}
                             </h2>
                           </div>
                         </div>

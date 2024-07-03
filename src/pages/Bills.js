@@ -105,7 +105,7 @@ export default function Bills() {
                                         </div>
                                     </div>
                                     :
-                                    trev - texp === 0
+                                    trev - texp === 0 
                                         ?
                                         <div className='flex flex-col space-y-5 -translate-y-5 items-center'>
                                             <h2>
@@ -136,7 +136,7 @@ export default function Bills() {
                                                     </div>
                                                 </div>
                                                 <h2 className='text-5xl text-red-600'>
-                                                    ₹ {Math.floor(trev - texp)}
+                                                    ₹ {Math.floor((trev - texp)*-1)}
                                                 </h2>
                                             </div>
                                         </div>

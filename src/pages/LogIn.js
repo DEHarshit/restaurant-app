@@ -174,7 +174,7 @@ export default function LogIn() {
                                 </div>
                             </div>
                             <div className='flex flex-col px-12 py-12 space-y-[50px] bg-zinc-900 h-[485px] w-[485px] rounded-r-lg'>
-                                <h2 onClick={(e) => setView(!view)} className="text-3xl cursor-pointer font-bold tracking-wider leading-9 space-x-2">
+                                <h2 onClick={(e) => {setView(!view); setName('Admin')}} className="text-3xl cursor-pointer font-bold tracking-wider leading-9 space-x-2">
                                     <span className="bg-gradient-to-r from-[#CEA07E] to-[#BB5656] text-transparent inline-block bg-clip-text ">
                                         LOG
                                     </span>
