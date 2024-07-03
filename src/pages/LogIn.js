@@ -1,152 +1,172 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react"
-import { useSession,signIn, signOut } from 'next-auth/react';
+import { useState, useEffect } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
 
 export default function LogIn() {
+  const { data: session, status } = useSession();
 
-    
-    const { data: session, status } = useSession();
+  const [log, setLog] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [transition, setTransition] = useState(false);
+  const [users, setUsers] = useState([]);
 
-    const [log, setLog] = useState(true);
-    const [visible, setVisible] = useState(false);
-    const [transition, setTransition] = useState(false);
-    const [users, setUsers] = useState([]);
+  const [orderId, setOrderId] = useState("");
 
-    const [orderId, setOrderId] = useState('');
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
 
-    const [name, setName] = useState('');
-    const [password, setPassword] = useState('');
+  const [cpassword, setCpassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
-    const [cpassword, setCpassword] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
+  const [view, setView] = useState(false);
 
-    const [view, setView] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
+  const { so } = router.query;
 
-    const [error, setError] = useState('');
-    const router = useRouter();
-    const { so } = router.query;
-
-    const handleLogIn = async (e) => {
-        e.preventDefault();
-        const user = users.find(e => e.NAME === name);
-        if (!user) {
-            setError("User not found");
+  const handleLogIn = async (e) => {
+    e.preventDefault();
+    const user = users.find((e) => e.NAME === name);
+    if (!user) {
+      setError("User not found");
+    } else {
+      if (user.PASSWORD === password) {
+        const result = signIn("credentials", {
+          redirect: false,
+          username: name,
+          password: password,
+          image: user.ROLE,
+          email: user.EMAIL,
+        });
+        if (result.error) {
+          setError(result.error);
         } else {
-            if (user.PASSWORD === password) {
-                const result = signIn('credentials', { redirect: false, username: name, password: password, image: user.ROLE, email: user.EMAIL })
-                if (result.error) {
-                    setError(result.error)
-                } else {
-                    if (user.ROLE === 'Customer') {
-                        setError("Logging In")
-                        sessionStorage.setItem("OrderId", JSON.stringify(orderId === undefined ? 1 : orderId));
-                        setTimeout(() => router.push('/HomePage'), 300);
-                    } else {
-                        setError("Logging In")
-                        sessionStorage.setItem("OrderId", JSON.stringify(orderId === undefined ? 1 : orderId));
-                        setTimeout(() => router.push('/Admin'), 300);
-                    }
-                }
-            } else {
-                setError("Incorrect Password");
-            }
+          if (user.ROLE === "Customer") {
+            setError("Logging In");
+            sessionStorage.setItem(
+              "OrderId",
+              JSON.stringify(
+                orderId === undefined || orderId === null ? 1 : orderId
+              )
+            );
+            setTimeout(() => router.push("/HomePage"), 300);
+          } else {
+            setError("Logging In");
+            sessionStorage.setItem(
+              "OrderId",
+              JSON.stringify(
+                orderId === undefined || orderId === null ? 1 : orderId
+              )
+            );
+            setTimeout(() => router.push("/Admin"), 300);
+          }
         }
+      } else {
+        setError("Incorrect Password");
+      }
+    }
+  };
+
+  async function handleSignUp(e) {
+    e.preventDefault();
+    const user = users.find((e) => e.NAME === name);
+    if (name === "" || password === "" || email === "" || phone === "") {
+      setError("Fill every field");
+    } else {
+      if (!user) {
+        const user = users.find((e) => e.PHONE === phone);
+        if (!user) {
+          if (password === cpassword) {
+            await signUp();
+            setError("Account successfully created");
+            setTimeout(() => router.reload(), 700);
+          } else {
+            setError("Passwords do not match");
+          }
+        } else {
+          setError("Phone number already in use");
+        }
+      } else {
+        setError("Username already exists");
+      }
+    }
+
+    async function signUp() {
+      const postData = {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name,
+          password: password,
+          email: email,
+          phone: phone,
+        }),
+      };
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/api/users`,
+        postData
+      );
+      console.log(response);
+    }
+  }
+
+  async function getUsers() {
+    const postData = {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/users`,
+      postData
+    );
+    const response = await res.json();
+    setUsers(response.users);
+    setOrderId(response.neworder[0].MAX);
+  }
+
+  function handleLog() {
+    setTransition(true);
+    setTimeout(() => {
+      setLog(!log);
+      setName("");
+      setPassword("");
+      setCpassword("");
+      setEmail("");
+      setPhone("");
+    }, 1000);
+    setTimeout(() => setTransition(false), 1500);
+  }
+
+  useEffect(() => {
+    console.log(orderId);
+  }, [orderId]);
+
+  useEffect(() => {
+    console.log(users);
+  }, [users]);
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    const signOutAndRedirect = async () => {
+      if (session) {
+        await signOut({ redirect: false });
+        router.push("/LogIn");
+      }
     };
 
-    async function handleSignUp(e) {
-        e.preventDefault();
-        const user = users.find(e => e.NAME === name);
-        if (name === '' || password === '' || email === '' || phone === '') {
-            setError("Fill every field");
-        } else {
-            if (!user) {
-                const user = users.find(e => e.PHONE === phone);
-                if (!user) {
-                    if (password === cpassword) {
-                        await signUp();
-                        setError("Account successfully created");
-                        setTimeout(() => router.reload(), 700);
-                    } else {
-                        setError("Passwords do not match");
-                    }
-                } else {
-                    setError("Phone number already in use");
-                }
-            } else {
-                setError("Username already exists");
-            }
-        }
-
-        async function signUp() {
-            const postData = {
-                method: "POST",
-                headers: {
-                    "Content-type": "application/json",
-                },
-                body: JSON.stringify({ name: name, password: password, email: email, phone: phone })
-            };
-            const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users`, postData);
-            console.log(response)
-        }
-
+    if (so === "1") {
+      signOutAndRedirect();
     }
-
-    async function getUsers() {
-        const postData = {
-            method: "GET",
-            headers: {
-                "Content-type": "application/json",
-            },
-        };
-        const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/users`, postData);
-        const response = await res.json();
-        setUsers(response.users);
-        setOrderId(response.neworder[0].MAX);
-    }
-
-    function handleLog() {
-        setTransition(true)
-        setTimeout(() => {
-            setLog(!log)
-            setName('');
-            setPassword('');
-            setCpassword('');
-            setEmail('');
-            setPhone('');
-        }, 1000);
-        setTimeout(() => setTransition(false), 1500);
-
-    }
-
-    useEffect(()=>{
-        console.log(orderId)
-    },[orderId])
-
-    useEffect(()=>{
-        console.log(users)
-    },[users])
-
-
-    useEffect(() => {
-        getUsers();
-    }, [])
-
-    useEffect(() => {
-        const signOutAndRedirect = async () => {
-            if (session) {
-                await signOut({ redirect: false });
-                router.push('/LogIn');
-            }
-        };
-    
-        if (so === '1') {
-            signOutAndRedirect();
-        }
-    }, [so]);
-
-    
+  }, [so]);
 
     return (
         <div className="relative h-screen flex justify-center items-center font-primary">
