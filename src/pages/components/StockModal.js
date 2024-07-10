@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import Ingredients from "../Ingredients";
+import { useRouter } from "next/router";
 
 export default function IngModal({ isVisible, mode, setModal, setMode, setStock, currStock, setCstock, setVstock, setGstock, setMstock }) {
     const [id, setId] = useState('')
@@ -8,7 +9,7 @@ export default function IngModal({ isVisible, mode, setModal, setMode, setStock,
     const [uom, setUom] = useState('')
     const [error, setError] = useState('')
 
-
+    const router = useRouter();
 
     const [ingredients, setIngredients] = useState([])
     const [selectIngredient, setSelectIngredient] = useState('')
@@ -65,6 +66,7 @@ export default function IngModal({ isVisible, mode, setModal, setMode, setStock,
                 const response = await res.json();
                 setStock(response.stock);
                 handleClose();
+                router.reload()
             }
             else {
                 console.log(res)

@@ -219,7 +219,7 @@ export default function Bills() {
                                 </td>
                                 <td>
                                     <div className='flex justify-center space-x-8'>
-                                        <Link href={`/Bill?id=${ele.OID}`}>
+                                        <Link href={`/Bill?id=${ele.OID}&tot=${ele.TOTAL_AMOUNT}`}>
                                             <button type="button" className='bg-zinc-800 hover:bg-pink-700 p-1 rounded-full px-2 hover:scale-[1.1] transition-all flex items-center justify-center space-x-1'>
                                                 View Bill
                                             </button>

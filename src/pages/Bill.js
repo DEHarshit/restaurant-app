@@ -7,7 +7,7 @@ import html2canvas from "html2canvas";
 
 export default function Bill() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, tot } = router.query;
 
   const { data: session, status } = useSession();
 
@@ -16,9 +16,15 @@ export default function Bill() {
 
   const [phone, setPhone] = useState("");
   const [userId, setUserId] = useState("");
+  const [discount, setDiscount] = useState(0)
+  const [points, setPoints] = useState(0);
 
   const gst = Math.round(((order.PRICE * 9) / 100) * 100) / 100;
-  const total = Math.round((order.PRICE + gst * 2) * 100) / 100;
+
+  const total = (Math.round((order.PRICE + gst * 2) * 100) / 100) > 500
+    ? (Math.round(((order.PRICE + gst * 2) - discount) * 100) / 100)
+    : Math.round((order.PRICE + gst * 2) * 100) / 100;
+
 
   async function getOrders() {
     if (id) {
@@ -52,6 +58,8 @@ export default function Bill() {
           price: total,
           phone: phone,
           name: session?.user?.name,
+          points: points,
+          aprice: total+discount
         }),
       };
       const res = await fetch(
@@ -82,6 +90,7 @@ export default function Bill() {
       if (response) {
         setPhone(response.phone[0].PHONE);
         setUserId(response.id[0].ID);
+        setPoints(response.points[0].POINTS)
       }
     }
   }
@@ -102,117 +111,226 @@ export default function Bill() {
       minute: "2-digit",
     });
 
-    html2canvas(input, { scale: 2 }).then(async (canvas) => {
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-
-      const pdf = new jsPDF({
-        orientation: "p",
-        unit: "pt",
-        format: "a4",
-      });
-
-      pdf.setFont("helvetica");
-
-      const HeaderText = "DRB-DDMSN";
-      const pageWidth2 = pdf.internal.pageSize.getWidth();
-      pdf.setFontSize(20);
-      const textWidth3 = pdf.getTextWidth(HeaderText);
-      const textX3 = (pageWidth2 - textWidth3) / 2;
-      pdf.text(HeaderText, textX3, pdf.internal.pageSize.getHeight() - 800);
-
-      pdf.setFontSize(16);
-      pdf.text(`Receipt #${order.ID}`, startX, startY - 30);
-
-      pdf.setFontSize(12);
-      pdf.text(`Date: ${currentDate}`, startX, startY);
-      pdf.text(
-        `Time: ${currentTime}`,
-        pdf.internal.pageSize.getWidth() - 150,
-        startY
-      );
-      startY += lineSpacing * 2;
-
-      pdf.setFontSize(12);
-      pdf.text(`Order ID: ${order.ID}`, startX, startY);
-      startY += lineSpacing * 2;
-
-      pdf.setFontSize(12);
-      pdf.setFillColor(207, 207, 207);
-      pdf.rect(
-        startX,
-        startY,
-        pdf.internal.pageSize.getWidth() - 80,
-        lineSpacing,
-        "F"
-      );
-      pdf.text("Item Name", startX + 10, startY + 15);
-      pdf.text("Quantity", startX + 250, startY + 15);
-      pdf.text("Cost", startX + 400, startY + 15);
-      startY += lineSpacing;
-
-      pdf.setFontSize(12);
-      ordetails.forEach((item) => {
+    {!tot ?
+      html2canvas(input, { scale: 2 }).then(async (canvas) => {
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+  
+        const pdf = new jsPDF({
+          orientation: "p",
+          unit: "pt",
+          format: "a4",
+        });
+  
+        pdf.setFont("helvetica");
+  
+        const HeaderText = "DRB-DDMSN";
+        const pageWidth2 = pdf.internal.pageSize.getWidth();
+        pdf.setFontSize(20);
+        const textWidth3 = pdf.getTextWidth(HeaderText);
+        const textX3 = (pageWidth2 - textWidth3) / 2;
+        pdf.text(HeaderText, textX3, pdf.internal.pageSize.getHeight() - 800);
+  
+        pdf.setFontSize(16);
+        pdf.text(`Receipt #${order.ID}`, startX, startY - 30);
+  
+        pdf.setFontSize(12);
+        pdf.text(`Date: ${currentDate}`, startX, startY);
+        pdf.text(
+          `Time: ${currentTime}`,
+          pdf.internal.pageSize.getWidth() - 150,
+          startY
+        );
         startY += lineSpacing * 2;
-        pdf.text(item.DNAME, startX + 10, startY);
-        pdf.text(item.QTY.toString(), startX + 250, startY);
-        pdf.text(item.PRICE.toString(), startX + 400, startY);
-        pdf.line(startX, startY + 10, startX + 500, startY + 10);
+  
+        pdf.setFontSize(12);
+        pdf.text(`Order ID: ${order.ID}`, startX, startY);
+        startY += lineSpacing * 2;
+  
+        pdf.setFontSize(12);
+        pdf.setFillColor(207, 207, 207);
+        pdf.rect(
+          startX,
+          startY,
+          pdf.internal.pageSize.getWidth() - 80,
+          lineSpacing,
+          "F"
+        );
+        pdf.text("Item Name", startX + 10, startY + 15);
+        pdf.text("Quantity", startX + 250, startY + 15);
+        pdf.text("Cost", startX + 400, startY + 15);
+        startY += lineSpacing;
+  
+        pdf.setFontSize(12);
+        ordetails.forEach((item) => {
+          startY += lineSpacing * 2;
+          pdf.text(item.DNAME, startX + 10, startY);
+          pdf.text(item.QTY.toString(), startX + 250, startY);
+          pdf.text(item.PRICE.toString(), startX + 400, startY);
+          pdf.line(startX, startY + 10, startX + 500, startY + 10);
+        });
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("Subtotal:", startX + 250, startY);
+        pdf.text(`Rs. ${order.PRICE}`, startX + 400, startY);
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("CGST:", startX + 250, startY);
+        pdf.text(`Rs. ${gst}`, startX + 400, startY);
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("SGST:", startX + 250, startY);
+        pdf.text(`Rs. ${gst}`, startX + 400, startY);
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("Discount:", startX + 250, startY);
+        pdf.text(`Rs. ${discount}`, startX + 400, startY);
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("Total:", startX + 250, startY);
+        pdf.line(startX + 350, startY - 20, startX + 500, startY - 20);
+        pdf.text(`Rs. ${total}`, startX + 400, startY);
+        pdf.line(startX + 350, startY + 10, startX + 500, startY + 10);
+  
+        const footerText1 = "SAVE PAPER SAVE NATURE !!";
+        const footerText2 = "Thank you for choosing us.";
+        const pageWidth = pdf.internal.pageSize.getWidth();
+  
+        pdf.setFontSize(10);
+        const textWidth1 = pdf.getTextWidth(footerText1);
+        const textX1 = (pageWidth - textWidth1) / 2;
+        pdf.text(footerText1, textX1, pdf.internal.pageSize.getHeight() - 50);
+  
+        pdf.setFontSize(10);
+        const textWidth2 = pdf.getTextWidth(footerText2);
+        const textX2 = (pageWidth - textWidth2) / 2;
+        pdf.text(footerText2, textX2, pdf.internal.pageSize.getHeight() - 30);
+  
+        pdf.save(`restaurant_bill_${order.ID}.pdf`);
+  
+        const pdfBase64 = pdf.output("datauristring").split(",")[1];
+  
+        const postData = {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({ email: session.user.email, pdfBase64 }),
+        };
+  
+        const res = await fetch("/api/sendemail", postData);
+        const response = await res.text();
+  
+        console.log(response);
+      })
+      :
+      html2canvas(input, { scale: 2 }).then(async (canvas) => {
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+  
+        const pdf = new jsPDF({
+          orientation: "p",
+          unit: "pt",
+          format: "a4",
+        });
+  
+        pdf.setFont("helvetica");
+  
+        const HeaderText = "DRB-DDMSN";
+        const pageWidth2 = pdf.internal.pageSize.getWidth();
+        pdf.setFontSize(20);
+        const textWidth3 = pdf.getTextWidth(HeaderText);
+        const textX3 = (pageWidth2 - textWidth3) / 2;
+        pdf.text(HeaderText, textX3, pdf.internal.pageSize.getHeight() - 800);
+  
+        pdf.setFontSize(16);
+        pdf.text(`Receipt #${order.ID}`, startX, startY - 30);
+  
+        pdf.setFontSize(12);
+        pdf.text(`Date: ${currentDate}`, startX, startY);
+        pdf.text(
+          `Time: ${currentTime}`,
+          pdf.internal.pageSize.getWidth() - 150,
+          startY
+        );
+        startY += lineSpacing * 2;
+  
+        pdf.setFontSize(12);
+        pdf.text(`Order ID: ${order.ID}`, startX, startY);
+        startY += lineSpacing * 2;
+  
+        pdf.setFontSize(12);
+        pdf.setFillColor(207, 207, 207);
+        pdf.rect(
+          startX,
+          startY,
+          pdf.internal.pageSize.getWidth() - 80,
+          lineSpacing,
+          "F"
+        );
+        pdf.text("Item Name", startX + 10, startY + 15);
+        pdf.text("Quantity", startX + 250, startY + 15);
+        pdf.text("Cost", startX + 400, startY + 15);
+        startY += lineSpacing;
+  
+        pdf.setFontSize(12);
+        ordetails.forEach((item) => {
+          startY += lineSpacing * 2;
+          pdf.text(item.DNAME, startX + 10, startY);
+          pdf.text(item.QTY.toString(), startX + 250, startY);
+          pdf.text(item.PRICE.toString(), startX + 400, startY);
+          pdf.line(startX, startY + 10, startX + 500, startY + 10);
+        });
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("Subtotal:", startX + 250, startY);
+        pdf.text(`Rs. ${order.PRICE}`, startX + 400, startY);
+  
+        startY += lineSpacing * 2;
+        pdf.setFontSize(12);
+        pdf.text("Paid Total:", startX + 250, startY);
+        pdf.line(startX + 350, startY - 20, startX + 500, startY - 20);
+        pdf.text(`Rs. ${tot}`, startX + 400, startY);
+        pdf.line(startX + 350, startY + 10, startX + 500, startY + 10);
+  
+        const footerText1 = "SAVE PAPER SAVE NATURE !!";
+        const footerText2 = "Thank you for choosing us.";
+        const pageWidth = pdf.internal.pageSize.getWidth();
+  
+        pdf.setFontSize(10);
+        const textWidth1 = pdf.getTextWidth(footerText1);
+        const textX1 = (pageWidth - textWidth1) / 2;
+        pdf.text(footerText1, textX1, pdf.internal.pageSize.getHeight() - 50);
+  
+        pdf.setFontSize(10);
+        const textWidth2 = pdf.getTextWidth(footerText2);
+        const textX2 = (pageWidth - textWidth2) / 2;
+        pdf.text(footerText2, textX2, pdf.internal.pageSize.getHeight() - 30);
+  
+        pdf.save(`restaurant_bill_${order.ID}.pdf`);
+  
+        const pdfBase64 = pdf.output("datauristring").split(",")[1];
+  
+        const postData = {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({ email: session.user.email, pdfBase64 }),
+        };
+  
+        const res = await fetch("/api/sendemail", postData);
+        const response = await res.text();
+  
+        console.log(response);
       });
-
-      startY += lineSpacing * 2;
-      pdf.setFontSize(12);
-      pdf.text("Subtotal:", startX + 250, startY);
-      pdf.text(`Rs. ${order.PRICE}`, startX + 400, startY);
-
-      startY += lineSpacing * 2;
-      pdf.setFontSize(12);
-      pdf.text("CGST:", startX + 250, startY);
-      pdf.text(`Rs. ${gst}`, startX + 400, startY);
-
-      startY += lineSpacing * 2;
-      pdf.setFontSize(12);
-      pdf.text("SGST:", startX + 250, startY);
-      pdf.text(`Rs. ${gst}`, startX + 400, startY);
-
-      startY += lineSpacing * 2;
-      pdf.setFontSize(12);
-      pdf.text("Total:", startX + 250, startY);
-      pdf.line(startX + 350, startY - 20, startX + 500, startY - 20);
-      pdf.text(`Rs. ${total}`, startX + 400, startY);
-      pdf.line(startX + 350, startY + 10, startX + 500, startY + 10);
-
-      const footerText1 = "SAVE PAPER SAVE NATURE !!";
-      const footerText2 = "Thank you for choosing us.";
-      const pageWidth = pdf.internal.pageSize.getWidth();
-
-      pdf.setFontSize(10);
-      const textWidth1 = pdf.getTextWidth(footerText1);
-      const textX1 = (pageWidth - textWidth1) / 2;
-      pdf.text(footerText1, textX1, pdf.internal.pageSize.getHeight() - 50);
-
-      pdf.setFontSize(10);
-      const textWidth2 = pdf.getTextWidth(footerText2);
-      const textX2 = (pageWidth - textWidth2) / 2;
-      pdf.text(footerText2, textX2, pdf.internal.pageSize.getHeight() - 30);
-
-      pdf.save(`restaurant_bill_${order.ID}.pdf`);
-
-      const pdfBase64 = pdf.output("datauristring").split(",")[1];
-
-      const postData = {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({ email: session.user.email, pdfBase64 }),
-      };
-
-      const res = await fetch("/api/sendemail", postData);
-      const response = await res.text();
-
-      console.log(response);
-    });
+    }
   }
 
   useEffect(() => {
@@ -222,6 +340,11 @@ export default function Bill() {
   useEffect(() => {
     getOrders();
   }, [id]);
+
+  useEffect(() => {
+    if (points > 10 && total > 500)
+      setDiscount(500)
+  }, [points])
 
   if (!id) {
     return <div>Loading...</div>;
@@ -236,6 +359,7 @@ export default function Bill() {
             <div className="h-full flex flex-col justify-between p-10">
               <div className="flex flex-col space-y-10">
                 <div className="flex font-semibold text-3xl">Bill</div>
+                <div className="flex text-md">Your Points: {points}</div>
                 <div>
                   <div>Order ID: {order.ID}</div>
                   <div className="py-10">
@@ -281,38 +405,65 @@ export default function Bill() {
                             </div>
                           </td>
                         </tr>
-                        <tr className="">
-                          <td colSpan="2" className="py-4 px-4 ">
-                            <div className="flex justify-end font-semibold">
-                              CGST @9%:
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 ">
-                            <div className="text-lg">₹ {gst}</div>
-                          </td>
-                        </tr>
-                        <tr className="">
-                          <td colSpan="2" className="py-4 px-4 ">
-                            <div className="flex justify-end font-semibold">
-                              SGST @9%:
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 ">
-                            <div className="text-lg">₹ {gst}</div>
-                          </td>
-                        </tr>
-                        <tr className="">
-                          <td colSpan="2" className="py-4 px-4 ">
-                            <div className="flex justify-end font-semibold">
-                              TOTAL:
-                            </div>
-                          </td>
-                          <td className="py-4 px-4 ">
-                            <div className="font-semibold text-xl text-green-600">
-                              ₹ {total}
-                            </div>
-                          </td>
-                        </tr>
+                        {!tot ?
+                          <span>
+                            <tr className="">
+                              <td colSpan="2" className="py-4 px-4 ">
+                                <div className="flex justify-end font-semibold">
+                                  CGST @9%:
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 ">
+                                <div className="text-lg">₹ {gst}</div>
+                              </td>
+                            </tr>
+                            <tr className="">
+                              <td colSpan="2" className="py-4 px-4 ">
+                                <div className="flex justify-end font-semibold">
+                                  SGST @9%:
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 ">
+                                <div className="text-lg">₹ {gst}</div>
+                              </td>
+                            </tr>
+                            <tr className="">
+                              <td colSpan="2" className="py-4 px-4 ">
+                                <div className="flex justify-end font-semibold">
+                                  DISCOUNT:
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 ">
+                                <div className="text-lg">₹ {discount}</div>
+                              </td>
+                            </tr>
+                            <tr className="">
+                              <td colSpan="2" className="py-4 px-4 ">
+                                <div className="flex justify-end font-semibold">
+                                  TOTAL:
+                                </div>
+                              </td>
+                              <td className="py-4 px-4 ">
+                                <div className="font-semibold text-xl text-green-600">
+                                  ₹ {total}
+                                </div>
+                              </td>
+                            </tr>
+                          </span>
+                          :
+                          <tr className="">
+                            <td colSpan="2" className="py-4 px-4 ">
+                              <div className="flex justify-end font-semibold">
+                                TOTAL:
+                              </div>
+                            </td>
+                            <td className="py-4 px-4 ">
+                              <div className="font-semibold text-xl text-green-600">
+                                ₹ {tot}
+                              </div>
+                            </td>
+                          </tr>
+                        }
                       </tbody>
                     </table>
                   </div>
@@ -349,7 +500,7 @@ export default function Bill() {
                   )}
                 </div>
               </div>
-            </div>                                                                                                                                                                                                                                                                                               
+            </div>
           </div>
         </div>
       </div>

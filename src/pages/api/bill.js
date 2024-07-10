@@ -10,8 +10,8 @@ export default async function handler(req, res) {
         res.status(200).json({ bills });
     } else if (req.method == "POST") {
         try {
-            const { id, user, phone, price, name } = req.body;
-
+            const { id, user, phone, price, name, points,aprice } = req.body;
+            let newpt= points;
 
             await query({
                 query: "INSERT INTO BILLS (USERID,TOTAL_AMOUNT,OID,PHONE,GEN_DATE,NAME) VALUES (?,?,?,?,NOW(),?)",
@@ -22,6 +22,21 @@ export default async function handler(req, res) {
                 query: "UPDATE ORDERS SET PSTATUS='Paid' WHERE ID=?",
                 values: [id]
             })
+
+            if ( price > 1000 ){
+                await query({
+                    query: "UPDATE USERS SET POINTS=? WHERE NAME=?",
+                    values: [newpt+1,name]
+                })
+                newpt = newpt + 1;
+            }
+
+            if ( newpt > 10 && aprice > 500){
+                await query({
+                    query: "UPDATE USERS SET POINTS=? WHERE NAME=?",
+                    values: [newpt-10,name]
+                })
+            }
 
             const order = await query({
                 query: "SELECT * FROM ORDERS WHERE ID=?",
