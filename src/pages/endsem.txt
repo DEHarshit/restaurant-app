@@ -1,0 +1,149 @@
+Use State
+
+Button
+
+Save button
+
+
+async function saveData() { // START
+const Data = {
+                    index: index,
+                    image: image,
+                    name: dishName,
+                    type: dishTimings,
+                    price: dishPrice,
+                    ing: dishIngredients,
+                    qty: dishQty,
+                    isveg: isVeg,
+                    ispre: isPre
+                }
+                    const postData = {
+                        method: "POST",
+                        headers: {
+                            "Content-type": "application/json",
+                        },
+                        body: JSON.stringify(Data)
+                    };
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/tdishes`, postData);
+                    console.log(response)
+                    if (response.status == 201) {
+                        setError('Data Created Successfully')
+                        setColor('text-green-600');
+                    } else {
+                        setError('There was an error')
+                        setColor('text-red-800');
+                    }
+                }
+
+api:
+
+import fsPromises from 'fs/promises';
+import path from 'path';
+
+const filePath = path.join(process.cwd(), 'src/pages/local/buffer.json');
+export default async function handler(req, res) {
+if (req.method == "POST") {
+        const jsonData = await fsPromises.readFile(filePath);
+        const objectData = JSON.parse(jsonData);
+        const { index,image, name, price, type, ing, qty, isveg,ispre } = req.body;
+
+        let imageUrl = image; // for image path
+        if (image !== '/placeholder.png' && image.indexOf('/dishes/') === -1) {
+            const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+            const buffer = Buffer.from(base64Data, 'base64');
+
+            const imageName = `${name.replace(/\s+/g, '-').toLowerCase()}.png`;
+            const imagePaths = path.join(imagePath, imageName);
+            await fsPromises.writeFile(imagePaths, buffer);
+
+            imageUrl = `/dishes/${imageName}`;
+        }
+        const newData = {
+            id:index+1,
+            image: imageUrl,
+            name,
+            type,
+            price,
+            ing,
+            qty,
+            isveg,
+            ispre
+        }
+        objectData.push(newData)
+
+        const updatedData = JSON.stringify(objectData);
+
+        await fsPromises.writeFile(filePath, updatedData);
+
+        res.status(201).json({ message: 'Data added successfully' });
+
+    }
+}
+
+commit: // commit should both save and commit
+new api:
+sync function handleCommit() {
+        await handleSave()
+        await commitData();
+    }
+
+    async function commitData() {
+        const postData = {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json",
+            },
+            body: JSON.stringify({index : 0 })
+        };
+        const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/dishes`, postData);
+        console.log(response)
+        if (response.status == 200) {
+            setError('Data Committed Successfully')
+            setColor('text-green-600');
+        } else {
+            setError('There was an error')
+            setColor('text-red-800');
+        }
+    }
+
+commit api:
+import { query } from "../../lib/db"
+import fsPromises from 'fs/promises';
+import path from 'path';
+
+const filePath = path.join(process.cwd(), 'src/pages/local/buffer.json');
+
+export default async function handler(req, res) {
+    if (req.method == "POST") {
+        try {
+            const { name, password, email, phone } = req.body;
+            const addUser = await query({
+                query: "INSERT INTO USERS (NAME,PASSWORD,PREVPASS,ROLE,EMAIL,PHONE) VALUES (?,?,?,?,?,?)",
+                values: [name, password, password, "Customer", email, phone]
+            })
+
+            const jsonData = await fsPromises.readFile(filePath);
+            const objectData = JSON.parse(jsonData);
+
+            const newData = {
+                id: objectData.length + 1,
+                name: name,
+                password: password,
+                prevpass: password,
+                role: "Customer",
+                email: email,
+                phone: phone
+            }
+
+            objectData.push(newData);
+
+            const updatedData = JSON.stringify(objectData);
+
+            await fsPromises.writeFile(filePath, updatedData);
+
+            res.status(200).json({ success: true });
+        }
+
+    }}
+
+            

@@ -139,7 +139,7 @@ export default function AddDish() {
                     }
                 }
             });
-            async function saveData() {
+            async function saveData() { 
                 const postData = {
                     method: "POST",
                     headers: {
@@ -184,7 +184,7 @@ export default function AddDish() {
                         }
                     }
                 });
-                async function saveData() {
+                async function saveData() { // START
                     const postData = {
                         method: "POST",
                         headers: {
