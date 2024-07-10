@@ -114,7 +114,7 @@ export default function Bills() {
                                             <div className='flex items-center space-x-5'>
                                                 <div>
                                                     <div className={`text-3xl scale-[1.5]`}>
-                                                        -
+                                                        
                                                     </div>
                                                 </div>
                                                 <h2 className='text-5xl'>

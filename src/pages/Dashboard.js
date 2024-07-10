@@ -379,7 +379,7 @@ export default function Dashboard({ timing }) {
                         <h2>Today's Profit/Loss</h2>
                         <div className="flex items-center space-x-5">
                           <div>
-                            <div className={`text-3xl scale-[1.5]`}>-</div>
+                            <div className={`text-3xl scale-[1.5]`}></div>
                           </div>
                           <h2 className="text-5xl">
                             ₹ {Math.floor(trev - texp)}
