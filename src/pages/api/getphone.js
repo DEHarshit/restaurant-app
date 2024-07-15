@@ -17,7 +17,11 @@ export default async function handler(req, res) {
                 query: "SELECT PASSWORD FROM USERS WHERE NAME=?",
                 values: [name]
             })
-            res.status(200).json({ phone, id, password });
+            const points = await query({
+                query: "SELECT POINTS FROM USERS WHERE NAME=?",
+                values: [name]
+            })
+            res.status(200).json({ phone, id, password, points });
         } catch (error) {
             res.status(500).json({ success: false, error: error.message });
         }
