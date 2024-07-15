@@ -51,7 +51,7 @@ export default function IngModal({ isVisible, mode, setModal, setMode, setStock,
     }
 
     async function handleAdd() {
-        if (qty === '' || exp === '') {
+        if (qty === '') {
             setError('Fill every field')
         } else {
             const postData = {

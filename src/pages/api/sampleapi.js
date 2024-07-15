@@ -57,7 +57,7 @@ export default async function handler(req, res) {
             const expDate = Math.ceil((payrollDate - hireDate) / (1000 * 60 * 60 * 24));
 
             await query({
-                query: "UPDATE PAYROLL SET EXP_DATE=? WHERE ID=?",
+                query: "UPDATE PAYROLL SET EXPERIENCE=? WHERE ID=?",
                 values: [expDate, emp.id]
             });
 

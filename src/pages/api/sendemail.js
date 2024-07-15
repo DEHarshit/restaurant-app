@@ -25,7 +25,7 @@ export default async function handler(req, res) {
       secure: false,
       auth: {
         user: "drbddmsn@hotmail.com",
-        pass: "jqgldudsaucytbbi",
+        pass: "nehusdqjuqdjyorf",
       },
     });
 
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       secure: false,
       auth: {
         user: "drbddmsn@hotmail.com",
-        pass: "jqgldudsaucytbbi",
+        pass: "nehusdqjuqdjyorf",
       },
     });
 

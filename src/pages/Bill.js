@@ -342,7 +342,7 @@ export default function Bill() {
   }, [id]);
 
   useEffect(() => {
-    if (points > 10 && total > 500)
+    if (points >= 10 && total > 500)
       setDiscount(500)
   }, [points])
 
